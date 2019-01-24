@@ -1,0 +1,229 @@
+.definition
+
+csr_misa =          [001100000001]
+csr_mvendorid =     [111100010001]
+csr_marchid =       [111100010010]
+csr_mimpid =        [111100010011]
+csr_mhartid =       [111100010100]
+csr_mstatus =       [001100000000]
+csr_mtvec =         [001100000101]
+csr_mip =           [001101000100]
+csr_mie =           [001100000100]
+csr_mcyclel =       [101100000000]
+csr_mcycleh =       [101110000000]
+csr_minstretl =     [101100000010]
+csr_minstreth =     [101110000010]
+csr_mscratch =      [001101000000]
+csr_mepc =          [001101000001]
+csr_mcause =        [001101000010]
+csr_mtval =         [001101000011]
+csr_mrac =          [011111000000]
+csr_dmst =          [011111000100]
+csr_mdeau =         [101111000000]
+csr_mdseac =        [111111000000]
+csr_meivt =         [101111001000]
+csr_meihap =        [111111001000]
+csr_meipt =         [101111001001]
+csr_meipt =         [101111001001]
+csr_meicpct =       [101111001010]
+csr_meicurpl =      [101111001100]
+csr_meicidpl =      [101111001011]
+csr_dcsr =          [011110110000]
+csr_dpc =           [011110110001]
+csr_dicawics =      [011111001000]
+csr_dicad0 =        [011111001001]
+csr_dicad1 =        [011111001010]
+csr_dicago =        [011111001011]
+csr_mtsel =         [011110100000]
+csr_mtdata1 =       [011110100001]
+csr_mtdata2 =       [011110100010]
+csr_mhpmc3 =        [101100000011]
+csr_mhpmc4 =        [101100000100]
+csr_mhpmc5 =        [101100000101]
+csr_mhpmc6 =        [101100000110]
+csr_mhpmc3h =       [101110000011]
+csr_mhpmc4h =       [101110000100]
+csr_mhpmc5h =       [101110000101]
+csr_mhpmc6h =       [101110000110]
+csr_mhpme3 =        [001100100011]
+csr_mhpme4 =        [001100100100]
+csr_mhpme5 =        [001100100101]
+csr_mhpme6 =        [001100100110]
+csr_micect =        [011111110000]
+csr_miccmect =      [011111110001]
+csr_mdccmect =      [011111110010]
+csr_mpmc =          [011111000110]
+csr_mcgc =          [011111111000]
+csr_mcpc =          [011111000010]
+csr_mfdc =          [011111111001]
+csr_mgpmc =         [011111010000]
+csr_perfva =        [101100000111]
+csr_perfvb =        [101100001...]
+csr_perfvc =        [10110001....]
+csr_perfvd =        [101110000111]
+csr_perfve =        [101110001...]
+csr_perfvf =        [10111001....]
+csr_perfvg =        [001100100111]
+csr_perfvh =        [001100101...]
+csr_perfvi =        [00110011....]
+
+.input 
+
+csr = {
+        dec_csr_rdaddr_d[11]
+        dec_csr_rdaddr_d[10]
+        dec_csr_rdaddr_d[9]
+        dec_csr_rdaddr_d[8]
+        dec_csr_rdaddr_d[7]
+        dec_csr_rdaddr_d[6]
+        dec_csr_rdaddr_d[5]
+        dec_csr_rdaddr_d[4]
+        dec_csr_rdaddr_d[3]
+        dec_csr_rdaddr_d[2]
+        dec_csr_rdaddr_d[1]
+        dec_csr_rdaddr_d[0]
+}
+
+.output
+
+csr = {
+     csr_misa   
+     csr_mvendorid      
+     csr_marchid        
+     csr_mimpid         
+     csr_mhartid        
+     csr_mstatus        
+     csr_mtvec  
+     csr_mip    
+     csr_mie    
+     csr_mcyclel        
+     csr_mcycleh        
+     csr_minstretl      
+     csr_minstreth      
+     csr_mscratch       
+     csr_mepc   
+     csr_mcause         
+     csr_mtval      
+     csr_mrac
+     csr_dmst
+     csr_mdeau
+     csr_mdseac
+     csr_meihap
+     csr_meivt
+     csr_meipt
+     csr_meicpct
+     csr_meicurpl
+     csr_meicidpl
+     csr_dcsr
+     csr_mpmc
+     csr_mcgc
+     csr_mcpc
+     csr_mfdc
+     csr_dpc
+     csr_mtsel	
+     csr_mtdata1	
+     csr_mtdata2
+     csr_mhpmc3
+     csr_mhpmc4
+     csr_mhpmc5
+     csr_mhpmc6
+     csr_mhpmc3h
+     csr_mhpmc4h
+     csr_mhpmc5h
+     csr_mhpmc6h
+     csr_mhpme3
+     csr_mhpme4
+     csr_mhpme5
+     csr_mhpme6
+     csr_mgpmc
+csr_perfva
+csr_perfvb
+csr_perfvc
+csr_perfvd
+csr_perfve
+csr_perfvf
+csr_perfvg
+csr_perfvh
+csr_perfvi
+     csr_micect
+     csr_miccmect
+     csr_mdccmect
+csr_dicawics
+csr_dicad0
+csr_dicad1
+csr_dicago
+     valid_only
+     presync
+     postsync
+}
+
+.decode
+
+csr[ csr_misa      ] = {  csr_misa      }
+csr[ csr_mvendorid ] = {  csr_mvendorid }
+csr[ csr_marchid   ] = {  csr_marchid   }
+csr[ csr_mimpid    ] = {  csr_mimpid    }
+csr[ csr_mhartid   ] = {  csr_mhartid   }
+csr[ csr_mstatus   ] = {  csr_mstatus postsync   }
+csr[ csr_mtvec     ] = {  csr_mtvec postsync}
+csr[ csr_mip       ] = {  csr_mip       }
+csr[ csr_mie       ] = {  csr_mie       }
+csr[ csr_mcyclel   ] = {  csr_mcyclel   }
+csr[ csr_mcycleh   ] = {  csr_mcycleh   }
+csr[ csr_minstretl ] = {  csr_minstretl presync }
+csr[ csr_minstreth ] = {  csr_minstreth presync }
+csr[ csr_mscratch  ] = {  csr_mscratch  }
+csr[ csr_mepc      ] = {  csr_mepc postsync}
+csr[ csr_mcause    ] = {  csr_mcause    }
+csr[ csr_mtval     ] = {  csr_mtval     }
+csr[ csr_mrac      ] = {  csr_mrac postsync     }
+csr[ csr_dmst      ] = {  csr_dmst postsync}
+csr[ csr_mdeau     ] = {  csr_mdeau    }
+csr[ csr_mdseac    ] = {  csr_mdseac    }
+csr[ csr_meipt     ] = {  csr_meipt     }
+csr[ csr_meihap    ] = {  csr_meihap    }
+csr[ csr_meivt     ] = {  csr_meivt     }
+csr[ csr_meicurpl  ] = {  csr_meicurpl  }
+csr[ csr_meicpct   ] = {  csr_meicpct   }
+csr[ csr_meicidpl  ] = {  csr_meicidpl  }
+csr[ csr_mpmc      ] = {  csr_mpmc      }
+csr[ csr_mcgc      ] = {  csr_mcgc      }
+csr[ csr_mgpmc     ] = {  csr_mgpmc presync postsync }
+csr[ csr_mcpc      ] = {  csr_mcpc presync postsync }
+csr[ csr_mfdc      ] = {  csr_mfdc presync postsync }
+csr[ csr_dcsr      ] = {  csr_dcsr      }
+csr[ csr_dpc       ] = {  csr_dpc       }
+csr[ csr_mtsel     ] = {  csr_mtsel     }
+csr[ csr_mtdata1   ] = {  csr_mtdata1  postsync }
+csr[ csr_mtdata2   ] = {  csr_mtdata2  postsync }
+csr[ csr_mhpmc3    ] = {  csr_mhpmc3  presync }
+csr[ csr_mhpmc4    ] = {  csr_mhpmc4  presync }
+csr[ csr_mhpmc5    ] = {  csr_mhpmc5  presync }
+csr[ csr_mhpmc6    ] = {  csr_mhpmc6  presync }
+csr[ csr_mhpmc3h   ] = {  csr_mhpmc3h presync  }
+csr[ csr_mhpmc4h   ] = {  csr_mhpmc4h presync  }
+csr[ csr_mhpmc5h   ] = {  csr_mhpmc5h presync  }
+csr[ csr_mhpmc6h   ] = {  csr_mhpmc6h presync  }
+csr[ csr_mhpme3    ] = {  csr_mhpme3    }
+csr[ csr_mhpme4    ] = {  csr_mhpme4    }
+csr[ csr_mhpme5    ] = {  csr_mhpme5    }
+csr[ csr_mhpme6    ] = {  csr_mhpme6    }
+csr[ csr_micect    ] = {  csr_micect    }
+csr[ csr_miccmect  ] = {  csr_miccmect  }
+csr[ csr_mdccmect  ] = {  csr_mdccmect  }
+csr[ csr_dicawics  ] = {  csr_dicawics  }  
+csr[ csr_dicad0    ] = {  csr_dicad0    }  
+csr[ csr_dicad1    ] = {  csr_dicad1    }  
+csr[ csr_dicago    ] = {  csr_dicago    }  
+
+csr[ csr_perfva    ] = { valid_only }
+csr[ csr_perfvb	   ] = { valid_only }
+csr[ csr_perfvc	   ] = { valid_only }
+csr[ csr_perfvd	   ] = { valid_only }
+csr[ csr_perfve	   ] = { valid_only }
+csr[ csr_perfvf	   ] = { valid_only }
+csr[ csr_perfvg	   ] = { valid_only }
+csr[ csr_perfvh	   ] = { valid_only }
+csr[ csr_perfvi    ] = { valid_only }
+
+.end

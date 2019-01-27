@@ -1,3 +1,4 @@
+$RV_ROOT/design/swerv_types.sv
 $RV_ROOT/design/swerv_wrapper.sv
 $RV_ROOT/design/mem.sv
 $RV_ROOT/design/pic_ctrl.sv

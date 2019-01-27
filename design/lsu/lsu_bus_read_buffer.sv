@@ -47,7 +47,9 @@ function automatic logic [31:0] lsu_align;
 endfunction // lsu_bus_read_buffer
 
 
-module lsu_bus_read_buffer (
+module lsu_bus_read_buffer
+  import swerv_types::*;
+  (
 
    input logic                  lsu_freeze_c2_dc3_clk,
    input logic                  lsu_c2_dc3_clk,                   // per stage clock 

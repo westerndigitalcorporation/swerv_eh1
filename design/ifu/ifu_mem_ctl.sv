@@ -21,7 +21,8 @@
 // BFF -> F1 -> F2 -> A
 //********************************************************************************
 
-module ifu_mem_ctl 
+module ifu_mem_ctl
+  import swerv_types::*;
   (
    input logic clk,
    input logic free_clk,                                            // free clock always except during pause

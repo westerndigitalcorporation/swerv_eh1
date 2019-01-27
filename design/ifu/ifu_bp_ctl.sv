@@ -17,14 +17,15 @@
 
 //********************************************************************************
 // Function: Branch predictor
-// Comments: 
-//           
+// Comments:
+//
 //
 //  Bank3 : Bank2 : Bank1 : Bank0
 //  FA  C       8       4       0
 //********************************************************************************
 
 module ifu_bp_ctl
+  import swerv_types::*;
   (
 		    
    input logic clk,

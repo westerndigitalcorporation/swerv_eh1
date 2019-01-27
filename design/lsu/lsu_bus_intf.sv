@@ -22,7 +22,9 @@
 // Comments:
 //
 //********************************************************************************
-module lsu_bus_intf (
+module lsu_bus_intf
+  import swerv_types::*;
+  (
    input logic                          clk,
    input logic                          rst_l,
    input logic                          scan_mode,

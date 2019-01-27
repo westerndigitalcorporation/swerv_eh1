@@ -24,7 +24,9 @@
 // //********************************************************************************
 
 
-module lsu_clkdomain (
+module lsu_clkdomain
+  import swerv_types::*;
+   (
    input logic      clk,                               // clock
    input logic      free_clk,                          // clock
    input logic      rst_l,                             // reset

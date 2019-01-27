@@ -24,7 +24,7 @@ ifeq ($(strip $(snapshot)),)
 	snapshot = default
 endif
 
-defines = ${RV_ROOT}/configs/snapshots/$(snapshot)/common_defines.vh ${RV_ROOT}/design/include/def.sv
+defines = ${RV_ROOT}/configs/snapshots/$(snapshot)/common_defines.vh
 includes = -I${RV_ROOT}/design/include -I${RV_ROOT}/design/lib -I${RV_ROOT}/design/dmi -I${RV_ROOT}/configs/snapshots/$(snapshot)
 
 all: clean verilator

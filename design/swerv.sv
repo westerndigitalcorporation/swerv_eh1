@@ -20,7 +20,8 @@
 // Comments: 
 //
 //********************************************************************************
-module swerv 
+module swerv
+  import swerv_types::*;
   (
    input logic		        clk,
    input logic		        rst_l,

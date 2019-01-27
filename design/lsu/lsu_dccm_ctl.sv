@@ -26,7 +26,8 @@
 // 
 // //********************************************************************************
 
-module lsu_dccm_ctl  
+module lsu_dccm_ctl
+  import swerv_types::*;
   (
    input logic                             lsu_freeze_c2_dc2_clk,     // clocks
    input logic                             lsu_freeze_c2_dc3_clk,

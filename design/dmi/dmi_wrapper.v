@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright 2019 Western Digital Corporation or its affiliates.
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 // http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,7 +16,7 @@
 //
 //  Copyright Western Digital, 2019
 //  Owner : Anusha Narayanamoorthy
-//  Description:  
+//  Description:
 //                Wrapper module for JTAG_TAP and DMI synchronizer
 //
 //-------------------------------------------------------------------------------------
@@ -25,26 +25,26 @@ module dmi_wrapper(
   // JTAG signals
   input              trst_n,                // JTAG clock
   input              tck,                 // JTAG reset
-  input              tms,                 // Test mode select   
+  input              tms,                 // Test mode select
   input              tdi,                 // Test Data Input
-  output             tdo,                 // Test Data Output           
-  output             tdoEnable,           // Test Data Output enable             
+  output             tdo,                 // Test Data Output
+  output             tdoEnable,           // Test Data Output enable
 
   // Processor Signals
-  input scan_mode, 
-  input              core_rst_n,            // Core clock                  
-  input              core_clk,            // Core reset                  
-  input [31:0]       rd_data,             // 32 bit Read data from  Processor                       
-  input              reg_ack,             // Acknowledgement signal from Processor                     
-  output [31:0]      reg_wr_data,         // 32 bit Write data to Processor                      
-  output [31:0]      reg_wr_addr,         // 32 bit Write address to Processor                   
-  output             reg_en,              // 1 bit  Write interface bit to Processor                                    
-  output             reg_wr_en,            // 1 bit  Write enable to Processor 
-  output             dmi_hard_reset  
+  input scan_mode,
+  input              core_rst_n,            // Core clock
+  input              core_clk,            // Core reset
+  input [31:0]       rd_data,             // 32 bit Read data from  Processor
+  input              reg_ack,             // Acknowledgement signal from Processor
+  output [31:0]      reg_wr_data,         // 32 bit Write data to Processor
+  output [31:0]      reg_wr_addr,         // 32 bit Write address to Processor
+  output             reg_en,              // 1 bit  Write interface bit to Processor
+  output             reg_wr_en,            // 1 bit  Write enable to Processor
+  output             dmi_hard_reset
 );
 
 
-  
+
   parameter DEVICE_ID_VAL = 32'b00000000000000000000000000000001;
 
 
@@ -62,13 +62,13 @@ module dmi_wrapper(
 
    assign j_wr_data[31:0] = j_wr_data_OS;
    assign j_wr_addr[31:0] = j_wr_addr_OS;
-   assign tdo = tdo_OS; 
-   assign tdoEnable = tdoEnable_OS; 
-   assign wr_intf = wr_intf_OS; 
+   assign tdo = tdo_OS;
+   assign tdoEnable = tdoEnable_OS;
+   assign wr_intf = wr_intf_OS;
    assign wr_enab = wr_enab_OS;
    assign dmireset = dmireset_OS;
    assign dmi_hard_reset = dmi_hard_reset_OS;
- 
+
  rvjtag_tap #(.DEVICE_ID_VAL(DEVICE_ID_VAL)) i_rvjtag_tap(
    .scan_mode(scan_mode),
    .trst(trst_n),                        // dedicated JTAG TRST (active low) pad signal or asynchronous active low power on reset
@@ -90,8 +90,8 @@ module dmi_wrapper(
    .dmi_hard_reset(dmi_hard_reset_OS),
    .dmi_reset(dmireset_OS)
 );
-   
- 
+
+
   // dmi_jtag_to_core_sync instantiation
   dmi_jtag_to_core_sync i_dmi_jtag_to_core_sync(
     .trst_n(trst_n),
@@ -107,7 +107,7 @@ module dmi_wrapper(
 
     .core_rst_n(core_rst_n),
     .core_clk(core_clk),
-    
+
     .c_rd_data(rd_data),                      // 32 bit Read data
     .c_rd_ack(reg_ack),                        // Read ack from core clock
 

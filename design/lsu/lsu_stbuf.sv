@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright 2019 Western Digital Corporation or its affiliates.
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 // http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,14 +16,14 @@
 //********************************************************************************
 // $Id$
 //
-// 
-// Owner: 
+//
+// Owner:
 // Function: Store Buffer
 // Comments: Dual writes and single drain
 //
-//  
+//
 // DC1 -> DC2 -> DC3 -> DC4 (Commit)
-// 
+//
 // //********************************************************************************
 
 
@@ -34,7 +34,7 @@ module lsu_stbuf
    input logic        rst_l,                              // reset
 
    input logic        lsu_freeze_c2_dc2_clk,              // freeze clock
-   input logic        lsu_freeze_c2_dc3_clk,              // freeze clock 
+   input logic        lsu_freeze_c2_dc3_clk,              // freeze clock
    input logic        lsu_freeze_c1_dc2_clk,              // freeze clock
    input logic        lsu_freeze_c1_dc3_clk,              // freeze clock
    input logic        lsu_c1_dc4_clk,                     // lsu pipe clock
@@ -43,11 +43,11 @@ module lsu_stbuf
    input logic        lsu_c2_dc5_clk,                     // lsu pipe clock
    input logic        lsu_stbuf_c1_clk,                   // stbuf clock
    input logic        lsu_free_c2_clk,                    // free clk
-                                            
-   // Store Buffer input 				       
+
+   // Store Buffer input
    input logic        load_stbuf_reqvld_dc3,             // core instruction goes to stbuf
    input logic        store_stbuf_reqvld_dc3,             // core instruction goes to stbuf
-   //input logic        ldst_stbuf_reqvld_dc3,               
+   //input logic        ldst_stbuf_reqvld_dc3,
    input logic        addr_in_pic_dc3,                    // address is in pic
    input logic [`RV_DCCM_DATA_WIDTH-1:0] store_ecc_datafn_hi_dc3,   // data to write
    input logic [`RV_DCCM_DATA_WIDTH-1:0] store_ecc_datafn_lo_dc3,   // data to write
@@ -55,14 +55,14 @@ module lsu_stbuf
    input logic        isldst_dc1,                         // instruction in dc1 is lsu
    input logic        isldst_dc2,                         // instruction in dc2 is lsu
    input logic        isldst_dc3,                         // instruction in dc3 is lsu
-				       
+
    input logic        single_ecc_error_hi_dc3,		  // single ecc error in hi bank
    input logic        single_ecc_error_lo_dc3,		  // single ecc error in lo bank
    input logic        lsu_single_ecc_error_dc5,           // single_ecc_error in either bank staged to the dc5 - needed for the load repairs
    input logic        lsu_commit_dc5,                     // lsu commits
    input logic        lsu_freeze_dc3,                     // lsu freeze
    input logic        flush_prior_dc5,                    // Flush is due to i0 and ld/st is in i1
-				       
+
    // Store Buffer output
    output logic                  stbuf_reqvld_any,         // stbuf is draining
    output logic                  stbuf_reqvld_flushed_any, // Top entry is flushed
@@ -74,42 +74,42 @@ module lsu_stbuf
    input  logic       lsu_stbuf_commit_any,                 // pop the stbuf as it commite
    output logic       lsu_stbuf_full_any,                   // stbuf is full
    output logic       lsu_stbuf_empty_any,                  // stbuf is empty
-                                           
+
    input logic [`RV_LSU_SB_BITS-1:0] lsu_addr_dc1,            // lsu address
    input logic [`RV_LSU_SB_BITS-1:0] lsu_addr_dc2,
    input logic [`RV_LSU_SB_BITS-1:0] lsu_addr_dc3,
-				       
+
    input logic [`RV_LSU_SB_BITS-1:0] end_addr_dc1,            // lsu end addrress - needed to check unaligned
    input logic [`RV_LSU_SB_BITS-1:0] end_addr_dc2,
    input logic [`RV_LSU_SB_BITS-1:0] end_addr_dc3,
-				       
+
    // Forwarding signals
    input logic        lsu_cmpen_dc2,                       // needed for forwarding stbuf - load
    input lsu_pkt_t    lsu_pkt_dc2,
-   input lsu_pkt_t    lsu_pkt_dc3,					    
-   input lsu_pkt_t    lsu_pkt_dc5,					    
-  
+   input lsu_pkt_t    lsu_pkt_dc3,
+   input lsu_pkt_t    lsu_pkt_dc5,
+
    output logic [`RV_DCCM_DATA_WIDTH-1:0] stbuf_fwddata_hi_dc3,     // stbuf data
    output logic [`RV_DCCM_DATA_WIDTH-1:0] stbuf_fwddata_lo_dc3,
    output logic [`RV_DCCM_BYTE_WIDTH-1:0] stbuf_fwdbyteen_hi_dc3,
    output logic [`RV_DCCM_BYTE_WIDTH-1:0] stbuf_fwdbyteen_lo_dc3,
-   
-   input  logic       scan_mode 
-				       
+
+   input  logic       scan_mode
+
 );
 
 `include "global.h"
-   
+
    localparam DEPTH = LSU_STBUF_DEPTH;
    localparam DATA_WIDTH = DCCM_DATA_WIDTH;
    localparam BYTE_WIDTH = DCCM_BYTE_WIDTH;
    localparam DEPTH_LOG2 = $clog2(DEPTH);
-   
+
    logic [DEPTH-1:0]       stbuf_data_vld;
    logic [DEPTH-1:0]       stbuf_drain_vld;
    logic [DEPTH-1:0]       stbuf_flush_vld;
    logic [DEPTH-1:0]       stbuf_addr_in_pic;
-   logic [DEPTH-1:0][LSU_SB_BITS-1:0] stbuf_addr; 
+   logic [DEPTH-1:0][LSU_SB_BITS-1:0] stbuf_addr;
    logic [DEPTH-1:0][BYTE_WIDTH-1:0]  stbuf_byteen;
    logic [DEPTH-1:0][DATA_WIDTH-1:0] stbuf_data;
 
@@ -123,16 +123,16 @@ module lsu_stbuf
    logic [DEPTH-1:0][LSU_SB_BITS-1:0] stbuf_addrin;
    logic [DEPTH-1:0][DATA_WIDTH-1:0] stbuf_datain;
    logic [DEPTH-1:0][BYTE_WIDTH-1:0]  stbuf_byteenin;
-   
+
    logic [7:0]             ldst_byteen_dc3;
    logic [7:0]		   store_byteen_ext_dc3;
    logic [BYTE_WIDTH-1:0]  store_byteen_hi_dc3;
    logic [BYTE_WIDTH-1:0]  store_byteen_lo_dc3;
 
-   logic                   ldst_stbuf_reqvld_dc3;               
+   logic                   ldst_stbuf_reqvld_dc3;
    logic                   dual_ecc_error_dc3;
    logic                   dual_stbuf_write_dc3;
-   
+
    logic                   WrPtrEn, RdPtrEn;
    logic [DEPTH_LOG2-1:0]  WrPtr, RdPtr;
    logic [DEPTH_LOG2-1:0]  NxtWrPtr, NxtRdPtr;
@@ -141,11 +141,11 @@ module lsu_stbuf
    logic                   ldst_dual_dc1, ldst_dual_dc2, ldst_dual_dc3, ldst_dual_dc4, ldst_dual_dc5;
    logic                   ldst_stbuf_reqvld_dc4, ldst_stbuf_reqvld_dc5;
    logic                   dual_stbuf_write_dc4, dual_stbuf_write_dc5;
-    
+
    logic [3:0] 		   stbuf_numvld_any, stbuf_specvld_any;
    logic [1:0] 		   stbuf_specvld_dc1, stbuf_specvld_dc2, stbuf_specvld_dc3;
    logic                   stbuf_oneavl_any, stbuf_twoavl_any;
-   
+
    logic                   cmpen_hi_dc2, cmpen_lo_dc2;
    logic [LSU_SB_BITS-1:$clog2(BYTE_WIDTH)]  cmpaddr_hi_dc2, cmpaddr_lo_dc2;
 
@@ -155,7 +155,7 @@ module lsu_stbuf
    logic [BYTE_WIDTH-1:0]  stbuf_fwdbyteen_lo_hi, stbuf_fwdbyteen_lo_lo;
    logic [DATA_WIDTH-1:0]  stbuf_fwddata_hi_hi, stbuf_fwddata_hi_lo;
    logic [DATA_WIDTH-1:0]  stbuf_fwddata_lo_hi, stbuf_fwddata_lo_lo;
-   
+
    logic [DEPTH-1:0]                 stbuf_ldmatch_hi, stbuf_ldmatch_lo;
    logic [DEPTH-1:0][BYTE_WIDTH-1:0] stbuf_fwdbyteenvec_hi, stbuf_fwdbyteenvec_lo;
    logic [DEPTH-1:0][DATA_WIDTH-1:0] stbuf_fwddatavec_hi, stbuf_fwddatavec_lo;
@@ -205,7 +205,7 @@ module lsu_stbuf
       assign stbuf_addrin[i][LSU_SB_BITS-1:0]  = sel_lo[i] ? lsu_addr_dc3[LSU_SB_BITS-1:0] : end_addr_dc3[LSU_SB_BITS-1:0];
       assign stbuf_byteenin[i][BYTE_WIDTH-1:0] = sel_lo[i] ? store_byteen_lo_dc3[BYTE_WIDTH-1:0] : store_byteen_hi_dc3[BYTE_WIDTH-1:0];
       assign stbuf_datain[i][DATA_WIDTH-1:0]  = sel_lo[i] ? store_ecc_datafn_lo_dc3[DATA_WIDTH-1:0] : store_ecc_datafn_hi_dc3[DATA_WIDTH-1:0];
-      
+
       rvdffsc #(.WIDTH(1)) stbuf_data_vldff (.din(1'b1), .dout(stbuf_data_vld[i]), .en(stbuf_wr_en[i]), .clear(stbuf_reset[i]), .clk(lsu_stbuf_c1_clk), .*);
       rvdffsc #(.WIDTH(1)) stbuf_drain_vldff (.din(1'b1), .dout(stbuf_drain_vld[i]), .en(stbuf_drain_en[i]), .clear(stbuf_reset[i]), .clk(lsu_free_c2_clk), .*);
       rvdffsc #(.WIDTH(1)) stbuf_flush_vldff (.din(1'b1), .dout(stbuf_flush_vld[i]), .en(stbuf_flush_en[i]), .clear(stbuf_reset[i]), .clk(lsu_free_c2_clk), .*);
@@ -263,7 +263,7 @@ module lsu_stbuf
 
    assign lsu_stbuf_full_any = (stbuf_specvld_any[3:0] > (DEPTH - 2));
    assign lsu_stbuf_empty_any = (stbuf_numvld_any[3:0] == 4'b0);
-   
+
    assign stbuf_oneavl_any = (stbuf_numvld_any[3:0] < DEPTH);
    assign stbuf_twoavl_any = (stbuf_numvld_any[3:0] < (DEPTH - 1));
 
@@ -273,7 +273,7 @@ module lsu_stbuf
 
    assign cmpen_lo_dc2 = lsu_cmpen_dc2;
    assign cmpaddr_lo_dc2[LSU_SB_BITS-1:$clog2(BYTE_WIDTH)] = lsu_addr_dc2[LSU_SB_BITS-1:$clog2(BYTE_WIDTH)];
-   
+
    // JIT forwarding
    assign stbuf_ldmatch_hi_hi = (end_addr_dc3[LSU_SB_BITS-1:$clog2(BYTE_WIDTH)] == cmpaddr_hi_dc2[LSU_SB_BITS-1:$clog2(BYTE_WIDTH)]) & ~(cmpen_hi_dc2 & lsu_pkt_dc2.dma & ~lsu_pkt_dc3.dma);
    assign stbuf_ldmatch_hi_lo = (lsu_addr_dc3[LSU_SB_BITS-1:$clog2(BYTE_WIDTH)] == cmpaddr_hi_dc2[LSU_SB_BITS-1:$clog2(BYTE_WIDTH)]) & ~(cmpen_hi_dc2 & lsu_pkt_dc2.dma & ~lsu_pkt_dc3.dma);
@@ -285,27 +285,27 @@ module lsu_stbuf
       assign stbuf_fwdbyteen_hi_lo[i] = stbuf_ldmatch_hi_lo & store_byteen_lo_dc3[i] & ldst_stbuf_reqvld_dc3;
       assign stbuf_fwdbyteen_lo_hi[i] = stbuf_ldmatch_lo_hi & store_byteen_hi_dc3[i] & ldst_stbuf_reqvld_dc3 & dual_stbuf_write_dc3;
       assign stbuf_fwdbyteen_lo_lo[i] = stbuf_ldmatch_lo_lo & store_byteen_lo_dc3[i] & ldst_stbuf_reqvld_dc3;
- 
+
       assign stbuf_fwddata_hi_hi[(8*i)+7:(8*i)] = {8{stbuf_fwdbyteen_hi_hi[i]}} & store_ecc_datafn_hi_dc3[(8*i)+7:(8*i)];
       assign stbuf_fwddata_hi_lo[(8*i)+7:(8*i)] = {8{stbuf_fwdbyteen_hi_lo[i]}} & store_ecc_datafn_lo_dc3[(8*i)+7:(8*i)];
       assign stbuf_fwddata_lo_hi[(8*i)+7:(8*i)] = {8{stbuf_fwdbyteen_lo_hi[i]}} & store_ecc_datafn_hi_dc3[(8*i)+7:(8*i)];
       assign stbuf_fwddata_lo_lo[(8*i)+7:(8*i)] = {8{stbuf_fwdbyteen_lo_lo[i]}} & store_ecc_datafn_lo_dc3[(8*i)+7:(8*i)];
    end
-				
+
 
    always_comb begin: GenLdFwd
       stbuf_fwdbyteen_hi_dc2[BYTE_WIDTH-1:0]   = '0;
       stbuf_fwdbyteen_lo_dc2[BYTE_WIDTH-1:0]   = '0;
       for (int i=0; i<DEPTH; i++) begin
-         stbuf_ldmatch_hi[i] = (stbuf_addr[i][LSU_SB_BITS-1:$clog2(BYTE_WIDTH)] == cmpaddr_hi_dc2[LSU_SB_BITS-1:$clog2(BYTE_WIDTH)]) &  
+         stbuf_ldmatch_hi[i] = (stbuf_addr[i][LSU_SB_BITS-1:$clog2(BYTE_WIDTH)] == cmpaddr_hi_dc2[LSU_SB_BITS-1:$clog2(BYTE_WIDTH)]) &
                                (stbuf_drain_vld[i] | ~lsu_pkt_dc2.dma) & ~stbuf_flush_vld[i];
-         stbuf_ldmatch_lo[i] = (stbuf_addr[i][LSU_SB_BITS-1:$clog2(BYTE_WIDTH)] == cmpaddr_lo_dc2[LSU_SB_BITS-1:$clog2(BYTE_WIDTH)]) & 
+         stbuf_ldmatch_lo[i] = (stbuf_addr[i][LSU_SB_BITS-1:$clog2(BYTE_WIDTH)] == cmpaddr_lo_dc2[LSU_SB_BITS-1:$clog2(BYTE_WIDTH)]) &
                                (stbuf_drain_vld[i] | ~lsu_pkt_dc2.dma) & ~stbuf_flush_vld[i];
 
 	 for (int j=0; j<BYTE_WIDTH; j++) begin
             stbuf_fwdbyteenvec_hi[i][j] = stbuf_ldmatch_hi[i] & stbuf_byteen[i][j] & stbuf_data_vld[i];
             stbuf_fwdbyteen_hi_dc2[j] |= stbuf_fwdbyteenvec_hi[i][j];
-	    
+
             stbuf_fwdbyteenvec_lo[i][j] = stbuf_ldmatch_lo[i] & stbuf_byteen[i][j] & stbuf_data_vld[i];
             stbuf_fwdbyteen_lo_dc2[j] |= stbuf_fwdbyteenvec_lo[i][j];
 	 end
@@ -313,7 +313,7 @@ module lsu_stbuf
    end // block: GenLdFwd
 
    for (genvar i=0; i<DEPTH; i++) begin
-      for (genvar j=0; j<BYTE_WIDTH; j++) begin 
+      for (genvar j=0; j<BYTE_WIDTH; j++) begin
          assign stbuf_fwddatavec_hi[i][(8*j)+7:(8*j)] = {8{stbuf_fwdbyteenvec_hi[i][j]}} & stbuf_data[i][(8*j)+7:(8*j)];
          assign stbuf_fwddatavec_lo[i][(8*j)+7:(8*j)] = {8{stbuf_fwdbyteenvec_lo[i][j]}} & stbuf_data[i][(8*j)+7:(8*j)];
       end
@@ -361,10 +361,10 @@ module lsu_stbuf
       assign stbuf_fwdbyteen_hi_fn_dc2[i] = stbuf_fwdbyteen_hi_hi[i] | stbuf_fwdbyteen_hi_lo[i] | stbuf_fwdbyteen_hi_dc2[i];
       assign stbuf_fwdbyteen_lo_fn_dc2[i] = stbuf_fwdbyteen_lo_hi[i] | stbuf_fwdbyteen_lo_lo[i] | stbuf_fwdbyteen_lo_dc2[i];
 
-      assign stbuf_fwddata_hi_fn_dc2[(8*i)+7:(8*i)] = (stbuf_fwdbyteen_hi_hi[i] | stbuf_fwdbyteen_hi_lo[i]) ? 
+      assign stbuf_fwddata_hi_fn_dc2[(8*i)+7:(8*i)] = (stbuf_fwdbyteen_hi_hi[i] | stbuf_fwdbyteen_hi_lo[i]) ?
                                                                          (stbuf_fwddata_hi_hi[(8*i)+7:(8*i)] | stbuf_fwddata_hi_lo[(8*i)+7:(8*i)]) :
                                                                          stbuf_fwddata_hi_dc2[(8*i)+7:(8*i)];
-      assign stbuf_fwddata_lo_fn_dc2[(8*i)+7:(8*i)] = (stbuf_fwdbyteen_lo_hi[i] | stbuf_fwdbyteen_lo_lo[i]) ? 
+      assign stbuf_fwddata_lo_fn_dc2[(8*i)+7:(8*i)] = (stbuf_fwdbyteen_lo_hi[i] | stbuf_fwdbyteen_lo_lo[i]) ?
                                                                          (stbuf_fwddata_lo_hi[(8*i)+7:(8*i)] | stbuf_fwddata_lo_lo[(8*i)+7:(8*i)]) :
                                                                          stbuf_fwddata_lo_dc2[(8*i)+7:(8*i)];
    end
@@ -384,6 +384,5 @@ module lsu_stbuf
    assert_drainorflushvld_notvld: assert #0 (~(|((stbuf_drain_vld[DEPTH-1:0] | stbuf_flush_vld[DEPTH-1:0]) & ~stbuf_data_vld[DEPTH-1:0])));
    assert_drainAndflushvld: assert #0 (~(|(stbuf_drain_vld[DEPTH-1:0] & stbuf_flush_vld[DEPTH-1:0])));
 `endif
-   
+
 endmodule
-					     

@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright 2019 Western Digital Corporation or its affiliates.
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 // http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -59,7 +59,7 @@ module exu_mul_ctl
    assign mul_c1_e2_clken        = (valid_e1 | clk_override) & ~freeze;
    assign mul_c1_e3_clken        = (valid_e2 | clk_override) & ~freeze;
 
-   // C1 - 1 clock pulse for data 
+   // C1 - 1 clock pulse for data
    rvclkhdr exu_mul_c1e1_cgc     (.*, .en(mul_c1_e1_clken),   .l1clk(exu_mul_c1_e1_clk));
    rvclkhdr exu_mul_c1e2_cgc     (.*, .en(mul_c1_e2_clken),   .l1clk(exu_mul_c1_e2_clk));
    rvclkhdr exu_mul_c1e3_cgc     (.*, .en(mul_c1_e3_clken),   .l1clk(exu_mul_c1_e3_clk));

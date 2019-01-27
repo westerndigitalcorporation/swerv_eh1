@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright 2019 Western Digital Corporation or its affiliates.
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 // http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -60,21 +60,21 @@ input   [1:0]       dmi_stat;
 input   [5:0]       abits;
 input   [3:0]       version;
 
-   
+
 /*
 --  revisionCode        : 4'h0;
 --  manufacturersIdCode : 11'h000;
 --  deviceIdCode        : 16'h0001;
 --  order MSB .. LSB -> [4 bit version or revision] [16 bit part number] [11 bit manufacturer id] [value of 1'b1 in LSB]
 */
-// Device ID 				     
+// Device ID
 parameter DEVICE_ID_VAL = 32'b1;
 localparam USER_DR_LENGTH = 66;
 
-reg tdo; 
+reg tdo;
 reg dmi_reset;
 reg dmi_hard_reset;
- 
+
 reg [USER_DR_LENGTH-1:0] sr, nsr, dr;
 
 ///////////////////////////////////////////////////////
@@ -82,13 +82,13 @@ reg [USER_DR_LENGTH-1:0] sr, nsr, dr;
 ///////////////////////////////////////////////////////
 logic[3:0] state, nstate;
 logic [4:0] ir;
-wire jtag_reset; 
-wire shift_dr;  
-wire pause_dr;  
-wire update_dr; 
+wire jtag_reset;
+wire shift_dr;
+wire pause_dr;
+wire update_dr;
 wire capture_dr;
-wire shift_ir;  
-wire pause_ir ; 
+wire shift_ir;
+wire pause_ir ;
 wire update_ir ;
 wire capture_ir;
 wire[1:0] dr_en;
@@ -115,7 +115,7 @@ always_comb  begin
     nstate = state;
     case(state)
     TEST_LOGIC_RESET_STATE: nstate = tms ? TEST_LOGIC_RESET_STATE : RUN_TEST_IDLE_STATE;
-    RUN_TEST_IDLE_STATE:    nstate = tms ? SELECT_DR_SCAN_STATE   : RUN_TEST_IDLE_STATE;  
+    RUN_TEST_IDLE_STATE:    nstate = tms ? SELECT_DR_SCAN_STATE   : RUN_TEST_IDLE_STATE;
     SELECT_DR_SCAN_STATE:   nstate = tms ? SELECT_IR_SCAN_STATE   : CAPTURE_DR_STATE;
     CAPTURE_DR_STATE:       nstate = tms ? EXIT1_DR_STATE         : SHIFT_DR_STATE;
     SHIFT_DR_STATE:         nstate = tms ? EXIT1_DR_STATE         : SHIFT_DR_STATE;
@@ -167,7 +167,7 @@ end
 assign devid_sel  = ir == 5'b00001;
 assign dr_en[0]   = ir == 5'b10000;
 assign dr_en[1]   = ir == 5'b10001;
- 
+
 ///////////////////////////////////////////////////////
 //                      Shift register
 ///////////////////////////////////////////////////////
@@ -213,11 +213,11 @@ always @ (posedge tck or negedge trst) begin
     if(!trst) begin
         dmi_hard_reset <= 1'b0;
         dmi_reset      <= 1'b0;
-    end 
+    end
     else if (update_dr & dr_en[0]) begin
         dmi_hard_reset <= sr[17];
         dmi_reset      <= sr[16];
-    end 
+    end
     else begin
         dmi_hard_reset <= 1'b0;
         dmi_reset      <= 1'b0;

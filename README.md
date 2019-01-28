@@ -85,3 +85,25 @@ This will create and populate the verilator *obj_dir/* in the current work dir.
 
     vcs  (Synopsys)  
     irun (Cadence)  
+
+### Running a simple Hello World program (verilator)
+
+    RV_ROOT = /path/to/swerv
+    export RV_ROOT
+
+    make -f $RV_ROOT/tools/Makefile verilator-run
+
+This will build a verilator model of SweRV with AHB-lite bus, and execute a short sequence of instructions that writes out "HELLO
+WORLD" to the bus.
+
+You can re-execute using
+
+    ./obj_dir/Vtb_top
+    Start of sim
+    HELLO WORLD
+    End of sim
+
+A vcd file `sim.vcd` is created which can be browsed by gtkwave or similar waveform viewers. `trace_port.csv` contains a log of
+the trace port.
+
+

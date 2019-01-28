@@ -47,7 +47,7 @@ irun: ${RV_ROOT}/configs/snapshots/$(snapshot)/common_defines.vh
 		-incdir ${RV_ROOT}/configs/snapshots/$(snapshot) -f ${RV_ROOT}/design/flist.vcs -elaborate  -snapshot default
 
 ${RV_ROOT}/configs/snapshots/$(snapshot)/common_defines.vh:
-	${RV_ROOT}/configs/swerv.confiyyg -snapshot=$(snapshot)
+	${RV_ROOT}/configs/swerv.config -snapshot=$(snapshot)
 
 verilator-run: 
 	snapshot=ahb

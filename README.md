@@ -26,7 +26,7 @@ Files under the [tools](tools/) directory may be available under a different lic
 ## Dependencies
 
 - Verilator **(3.926 or later)** must be installed on the system
-- If addding/reoving instructions, espresso must be installed (used by *tools/coredecode*)
+- If adding/removing instructions, espresso must be installed (used by *tools/coredecode*)
 
 ## Quickstart guide
 1. Clone the repository

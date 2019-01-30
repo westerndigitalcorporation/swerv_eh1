@@ -1,6 +1,6 @@
-# SweRV RISC-V core from Western Digital
+# SweRV RISC-V Core<sup>TM</sup> from Western Digital
 
-This repository contains the SweRV core design RTL
+This repository contains the SweRV Core<sup>TM</sup> design RTL
 
 ## License
 
@@ -106,4 +106,5 @@ You can re-execute using
 A vcd file `sim.vcd` is created which can be browsed by gtkwave or similar waveform viewers. `trace_port.csv` contains a log of
 the trace port.
 
-
+----
+Western Digital, the Western Digital logo, G-Technology, SanDisk, Tegile, Upthere, WD, SweRV Core, SweRV ISS, and OmniXtend are registered trademarks or trademarks of Western Digital Corporation or its affiliates in the US and/or other countries. All other marks are the property of their respective owners.

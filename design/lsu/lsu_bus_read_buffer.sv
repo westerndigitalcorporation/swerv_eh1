@@ -149,6 +149,7 @@ module lsu_bus_read_buffer (
 
    state_t [DEPTH-1:0]       busfifo_state;
    state_t [DEPTH-1:0]       busfifo_nxtstate;
+   logic   [DEPTH-1:0][2:0]  busfifo_state_dout;
    logic   [DEPTH-1:0]       busfifo_block;
    logic   [DEPTH-1:0]       busfifo_dual;
    logic   [DEPTH-1:0]       busfifo_nb;
@@ -347,8 +348,9 @@ module lsu_bus_read_buffer (
          endcase
       end
 
+   assign busfifo_state[i] = state_t'(busfifo_state_dout[i]);
       //rvdffsc #(.WIDTH($bits(state_t))) busfifo_state_ff (.din(busfifo_nxtstate[i]), .dout({busfifo_state[i]}), .sel(busfifo_state_en[i]), .clear(busfifo_rst), .clk(lsu_free_c2_clk), .*);
-      rvdffsc #(.WIDTH($bits(state_t))) busfifo_state_ff (.din(busfifo_nxtstate[i]), .dout({busfifo_state[i]}), .en(busfifo_state_en[i]), .clear(busfifo_rst[i]), .clk(lsu_free_c2_clk), .*);
+      rvdffsc #(.WIDTH($bits(state_t))) busfifo_state_ff (.din(busfifo_nxtstate[i]), .dout(busfifo_state_dout[i]), .en(busfifo_state_en[i]), .clear(busfifo_rst[i]), .clk(lsu_free_c2_clk), .*);
       rvdffsc  #(.WIDTH(1)) busfifo_blockff (.din(lsu_read_buffer_block_dc3), .dout(busfifo_block[i]), .en(busfifo_wr_en[i]), .clear(busfifo_block_rst[i]), .clk(lsu_rdbuf_c1_clk), .*);  // Stall the entry till write buffer is empty
       rvdffs  #(.WIDTH(1)) busfifo_dualff (.din(ldst_dual_dc3), .dout(busfifo_dual[i]), .en(busfifo_wr_en[i]), .clk(lsu_rdbuf_c1_clk), .*);
       rvdffs  #(.WIDTH(1)) busfifo_nbff (.din(lsu_nonblock_load_valid_dc3), .dout(busfifo_nb[i]), .en(busfifo_wr_en[i]), .clk(lsu_rdbuf_c1_clk), .*);

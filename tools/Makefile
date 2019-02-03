@@ -37,6 +37,7 @@ clean:
 verilator: ${RV_ROOT}/configs/snapshots/$(snapshot)/common_defines.vh
 	verilator '-UASSERT_ON' --cc -CFLAGS ${CFLAGS} $(defines) $(includes) ${RV_ROOT}/configs/snapshots/$(snapshot)/common_defines.vh \
 		-f ${RV_ROOT}/design/flist.verilator --top-module swerv_wrapper
+	make -C obj_dir/ -f Vswerv_wrapper.mk
 
 vcs: ${RV_ROOT}/configs/snapshots/$(snapshot)/common_defines.vh
 	vcs -full64 -assert svaext -sverilog +define+RV_OPENSOURCE +error+500 +incdir+${RV_ROOT}/design/lib +incdir+${RV_ROOT}/design/include \

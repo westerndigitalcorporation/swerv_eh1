@@ -26,6 +26,8 @@ endif
 
 defines = ${RV_ROOT}/configs/snapshots/$(snapshot)/common_defines.vh ${RV_ROOT}/design/include/def.sv
 includes = -I${RV_ROOT}/design/include -I${RV_ROOT}/design/lib -I${RV_ROOT}/design/dmi -I${RV_ROOT}/configs/snapshots/$(snapshot)
+# CFLAGS for verilator generated Makefiles. Without -std=c++11 it complains for `auto` variables
+CFLAGS += "-std=c++11"
 
 all: clean verilator
 
@@ -33,7 +35,9 @@ clean:
 	rm -rf obj_dir
 
 verilator: ${RV_ROOT}/configs/snapshots/$(snapshot)/common_defines.vh
-		verilator '-UASSERT_ON' --cc  $(includes) -f ${RV_ROOT}/design/flist.verilator --top-module swerv_wrapper 
+	verilator '-UASSERT_ON' --cc -CFLAGS ${CFLAGS} $(defines) $(includes) ${RV_ROOT}/configs/snapshots/$(snapshot)/common_defines.vh \
+		-f ${RV_ROOT}/design/flist.verilator --top-module swerv_wrapper
+	make -C obj_dir/ -f Vswerv_wrapper.mk
 
 vcs: ${RV_ROOT}/configs/snapshots/$(snapshot)/common_defines.vh
 	vcs -full64 -assert svaext -sverilog +define+RV_OPENSOURCE +error+500 +incdir+${RV_ROOT}/design/lib +incdir+${RV_ROOT}/design/include \
@@ -52,7 +56,7 @@ ${RV_ROOT}/configs/snapshots/$(snapshot)/common_defines.vh:
 verilator-run: 
 	snapshot=ahb
 	${RV_ROOT}/configs/swerv.config -snapshot=$(snapshot) -ahb
-	verilator '-UASSERT_ON' --cc $(defines) $(includes) ${RV_ROOT}/configs/snapshots/$(snapshot)/common_defines.vh \
+	verilator '-UASSERT_ON' --cc -CFLAGS ${CFLAGS} $(defines) $(includes) ${RV_ROOT}/configs/snapshots/$(snapshot)/common_defines.vh \
 		${RV_ROOT}/testbench/tb_top.sv -I${RV_ROOT}/testbench \
 		-f ${RV_ROOT}/design/flist.verilator --top-module tb_top -exe test_tb_top.cpp --trace --autoflush
 	cp ${RV_ROOT}/testbench/test_tb_top.cpp obj_dir/

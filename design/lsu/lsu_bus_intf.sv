@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright 2019 Western Digital Corporation or its affiliates.
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 // http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,22 +16,24 @@
 //********************************************************************************
 // $Id$
 //
-// 
-// Owner: 
+//
+// Owner:
 // Function: lsu interface with interface queue
 // Comments:
 //
 //********************************************************************************
-module lsu_bus_intf (
+module lsu_bus_intf
+  import swerv_types::*;
+  (
    input logic                          clk,
    input logic                          rst_l,
    input logic                          scan_mode,
    input logic                          dec_tlu_non_blocking_disable,     // disable non block
    input logic                          dec_tlu_wb_coalescing_disable,    // disable write buffer coalescing
    input logic                          dec_tlu_ld_miss_byp_wb_disable,   // disable ld miss bypass of the write buffer
-   
+
    // various clocks needed for the bus reads and writes
-   input logic                          lsu_c1_dc3_clk,       
+   input logic                          lsu_c1_dc3_clk,
    input logic                          lsu_c1_dc4_clk,
    input logic                          lsu_c1_dc5_clk,
    input logic                          lsu_c2_dc3_clk,
@@ -45,9 +47,9 @@ module lsu_bus_intf (
    input logic                          lsu_wrbuf_c1_clk,
    input logic                          lsu_free_c2_clk,
    input logic                          lsu_busm_clk,
-                     
+
    input logic                          lsu_busreq_dc2,                   // bus request is in dc2
- 
+
    input                                lsu_pkt_t lsu_pkt_dc1,            // lsu packet flowing down the pipe
    input                                lsu_pkt_t lsu_pkt_dc2,            // lsu packet flowing down the pipe
    input                                lsu_pkt_t lsu_pkt_dc3,            // lsu packet flowing down the pipe
@@ -66,7 +68,7 @@ module lsu_bus_intf (
    input logic [31:0]                   end_addr_dc4,                     // lsu address flowing down the pipe
    input logic [31:0]                   end_addr_dc5,                     // lsu address flowing down the pipe
 
-   input logic                          addr_external_dc2,                // lsu instruction going to external 
+   input logic                          addr_external_dc2,                // lsu instruction going to external
    input logic                          addr_external_dc3,                // lsu instruction going to external
    input logic                          addr_external_dc4,                // lsu instruction going to external
    input logic                          addr_external_dc5,                // lsu instruction going to external
@@ -79,7 +81,7 @@ module lsu_bus_intf (
    input logic                          lsu_commit_dc5,                   // lsu instruction in dc5 commits
    input logic                          is_sideeffects_dc2,               // lsu attribute is side_effects
    input logic                          is_sideeffects_dc3,               // lsu attribute is side_effects
-   input logic                          flush_dc2_up,                     // flush 
+   input logic                          flush_dc2_up,                     // flush
    input logic                          flush_dc3,                        // flush
    input logic                          flush_dc4,                        // flush
    input logic                          flush_dc5,                        // flush
@@ -94,7 +96,7 @@ module lsu_bus_intf (
    output logic [31:0]                  bus_read_data_dc3,                // the Dc3 load data
 
    output logic                         ld_bus_error_dc3,                 // bus error in dc3
-   output logic [31:0]                  ld_bus_error_addr_dc3,            // address of the bus error 
+   output logic [31:0]                  ld_bus_error_addr_dc3,            // address of the bus error
 
    output logic                         lsu_imprecise_error_load_any,     // imprecise load bus error
    output logic                         lsu_imprecise_error_store_any,    // imprecise store bus error
@@ -106,18 +108,18 @@ module lsu_bus_intf (
    output logic [`RV_LSU_NUM_NBLOAD_WIDTH-1:0] lsu_nonblock_load_tag_dc3,       // the tag of the external non block load
    output logic                                lsu_nonblock_load_inv_dc5,       // invalidate signal for the cam entry for non block loads
    output logic [`RV_LSU_NUM_NBLOAD_WIDTH-1:0] lsu_nonblock_load_inv_tag_dc5,   // tag of the enrty which needs to be invalidated
-   output logic                                lsu_nonblock_load_data_valid,    // the non block is valid - sending information back to the cam                                               
-   output logic                                lsu_nonblock_load_data_error,    // non block load has an error                 
-   output logic [`RV_LSU_NUM_NBLOAD_WIDTH-1:0] lsu_nonblock_load_data_tag,      // the tag of the non block load sending the data/error                                             
-   output logic [31:0]                         lsu_nonblock_load_data,          // Data of the non block load	
+   output logic                                lsu_nonblock_load_data_valid,    // the non block is valid - sending information back to the cam
+   output logic                                lsu_nonblock_load_data_error,    // non block load has an error
+   output logic [`RV_LSU_NUM_NBLOAD_WIDTH-1:0] lsu_nonblock_load_data_tag,      // the tag of the non block load sending the data/error
+   output logic [31:0]                         lsu_nonblock_load_data,          // Data of the non block load
 
    // PMU events
    output logic                         lsu_pmu_bus_trxn,
    output logic                         lsu_pmu_bus_misaligned,
    output logic                         lsu_pmu_bus_error,
    output logic                         lsu_pmu_bus_busy,
-                     
-   // AXI signals               
+
+   // AXI signals
    // AXI Write Channels
    output logic                         lsu_axi_awvalid,
    input  logic                         lsu_axi_awready,
@@ -131,8 +133,8 @@ module lsu_bus_intf (
    output logic [3:0]                   lsu_axi_awcache,
    output logic [2:0]                   lsu_axi_awprot,
    output logic [3:0]                   lsu_axi_awqos,
-                             
-   output logic                         lsu_axi_wvalid,                                       
+
+   output logic                         lsu_axi_wvalid,
    input  logic                         lsu_axi_wready,
    output logic [63:0]                  lsu_axi_wdata,
    output logic [7:0]                   lsu_axi_wstrb,
@@ -163,7 +165,7 @@ module lsu_bus_intf (
    input  logic [63:0]                  lsu_axi_rdata,
    input  logic [1:0]                   lsu_axi_rresp,
    input  logic                         lsu_axi_rlast,
-                                          
+
    input logic                          lsu_bus_clk_en
 
 );
@@ -171,26 +173,26 @@ module lsu_bus_intf (
 `include "global.h"
 
    logic              rdbuf_full_freeze_dc3;
-   logic              ld_freeze_dc3;		     
+   logic              ld_freeze_dc3;
 
-   logic              store_freeze_dc3;		     
+   logic              store_freeze_dc3;
 
    logic              lsu_bus_clk_en_q;
    logic              write_buffer_block_any;       // Block the write buffer if there are outstanding non-blocking loads
    logic              ldst_dual_dc1, ldst_dual_dc2, ldst_dual_dc3, ldst_dual_dc4, ldst_dual_dc5;
    logic              lsu_read_buffer_block_dc2;
-   
+
    logic [3:0]        ldst_byteen_dc2, ldst_byteen_dc3, ldst_byteen_dc4, ldst_byteen_dc5;
    logic [15:0]       ldst_byteen_ext_dc2, ldst_byteen_ext_dc3, ldst_byteen_ext_dc4, ldst_byteen_ext_dc5;
    logic [7:0] 	      ldst_byteen_hi_dc2, ldst_byteen_hi_dc3, ldst_byteen_hi_dc4, ldst_byteen_hi_dc5;
    logic [7:0] 	      ldst_byteen_lo_dc2, ldst_byteen_lo_dc3, ldst_byteen_lo_dc4, ldst_byteen_lo_dc5;
    logic              is_sideeffects_dc4, is_sideeffects_dc5;
 
-   
+
    logic [127:0]      store_data_ext_dc3, store_data_ext_dc4, store_data_ext_dc5;
    logic [63:0]       store_data_hi_dc3, store_data_hi_dc4, store_data_hi_dc5;
    logic [63:0]       store_data_lo_dc3, store_data_lo_dc4, store_data_lo_dc5;
-   
+
    logic              ld_addr_dc3hit_lo_lo, ld_addr_dc3hit_hi_lo, ld_addr_dc3hit_lo_hi, ld_addr_dc3hit_hi_hi;
    logic              ld_addr_dc4hit_lo_lo, ld_addr_dc4hit_hi_lo, ld_addr_dc4hit_lo_hi, ld_addr_dc4hit_hi_hi;
    logic              ld_addr_dc5hit_lo_lo, ld_addr_dc5hit_hi_lo, ld_addr_dc5hit_lo_hi, ld_addr_dc5hit_hi_hi;
@@ -207,14 +209,14 @@ module lsu_bus_intf (
 
    logic [7:0]        ld_byte_hit_wrbuf_lo, ld_byte_hit_wrbuf_hi;
    logic [63:0]       ld_fwddata_wrbuf_lo, ld_fwddata_wrbuf_hi;
-   
+
    logic              ld_hit_rdbuf_hi, ld_hit_rdbuf_lo;
    logic [63:0]       ld_fwddata_rdbuf_hi, ld_fwddata_rdbuf_lo;
 
    logic [63:0]       ld_fwddata_lo, ld_fwddata_hi;
    logic [31:0]       ld_fwddata_dc2, ld_fwddata_dc3;
    logic [31:0]       ld_read_buffer_data_dc3;
-   
+
    logic              ld_full_hit_hi_dc2, ld_full_hit_lo_dc2;
    logic              ld_hit_dc2, ld_full_hit_dc2, ld_full_hit_dc3;
    logic              is_aligned_dc5;
@@ -224,7 +226,7 @@ module lsu_bus_intf (
    logic              ld_imprecise_bus_error_any;
    logic [31:0]       ld_imprecise_bus_error_addr;
    logic [127:32]     ld_fwddata_dc2_nc;
-   
+
    // PMU signals
    assign lsu_pmu_bus_trxn  = (lsu_axi_awvalid & lsu_axi_awready) | (lsu_axi_arvalid & lsu_axi_arready);
    assign lsu_pmu_bus_misaligned = lsu_busreq_dc2 & ldst_dual_dc2;
@@ -236,12 +238,12 @@ module lsu_bus_intf (
                                  ({4{lsu_pkt_dc2.word}} & 4'b1111);
    assign ldst_dual_dc1 = (lsu_addr_dc1[3] != end_addr_dc1[3]);
    assign lsu_freeze_dc3 = (rdbuf_full_freeze_dc3 | ld_freeze_dc3 | store_freeze_dc3) & ~(flush_dc4 | flush_dc5);
-   
+
    assign lsu_imprecise_error_load_any       = ld_imprecise_bus_error_any;
    assign lsu_imprecise_error_store_any      = store_bus_error_any & ~ld_imprecise_bus_error_any;
    assign lsu_imprecise_error_addr_any[31:0] = ld_imprecise_bus_error_any ? ld_imprecise_bus_error_addr[31:0] : store_bus_error_addr[31:0];
    //assign ld_bus_error_addr_dc3[31:0]        = last_bus_addr[31:0];
-   
+
    // Determine if the packet is word aligned
    assign is_aligned_dc5  = (lsu_pkt_dc5.word & (lsu_addr_dc5[1:0] == 2'b0)) |
                             (lsu_pkt_dc5.half & (lsu_addr_dc5[0] == 1'b0));
@@ -255,7 +257,7 @@ module lsu_bus_intf (
    lsu_bus_write_buffer bus_write_buffer (
       .*
    );
-   
+
    // Create Hi/Lo signals
    assign ldst_byteen_ext_dc2[15:0] = {12'b0,ldst_byteen_dc2[3:0]} << lsu_addr_dc2[2:0];
    assign ldst_byteen_ext_dc3[15:0] = {12'b0,ldst_byteen_dc3[3:0]} << lsu_addr_dc3[2:0];
@@ -265,7 +267,7 @@ module lsu_bus_intf (
    assign store_data_ext_dc3[127:0] = {64'b0,store_data_dc3[63:0]} << {lsu_addr_dc3[2:0],3'b0};
    assign store_data_ext_dc4[127:0] = {96'b0,store_data_dc4[31:0]} << {lsu_addr_dc4[2:0],3'b0};
    assign store_data_ext_dc5[127:0] = {96'b0,store_data_dc5[31:0]} << {lsu_addr_dc5[2:0],3'b0};
-   
+
    assign ldst_byteen_hi_dc2[7:0]   = ldst_byteen_ext_dc2[15:8];
    assign ldst_byteen_lo_dc2[7:0]   = ldst_byteen_ext_dc2[7:0];
    assign ldst_byteen_hi_dc3[7:0]   = ldst_byteen_ext_dc3[15:8];
@@ -281,7 +283,7 @@ module lsu_bus_intf (
    assign store_data_lo_dc4[63:0]   = store_data_ext_dc4[63:0];
    assign store_data_hi_dc5[63:0]   = store_data_ext_dc5[127:64];
    assign store_data_lo_dc5[63:0]   = store_data_ext_dc5[63:0];
-   
+
    assign ld_addr_dc3hit_lo_lo = (lsu_addr_dc2[31:3] == lsu_addr_dc3[31:3]) & lsu_pkt_dc3.valid & lsu_pkt_dc3.store & lsu_busreq_dc2;
    assign ld_addr_dc3hit_lo_hi = (end_addr_dc2[31:3] == lsu_addr_dc3[31:3]) & lsu_pkt_dc3.valid & lsu_pkt_dc3.store & lsu_busreq_dc2;
    assign ld_addr_dc3hit_hi_lo = (lsu_addr_dc2[31:3] == end_addr_dc3[31:3]) & lsu_pkt_dc3.valid & lsu_pkt_dc3.store & lsu_busreq_dc2;
@@ -352,7 +354,7 @@ module lsu_bus_intf (
                                             ld_byte_dc5hit_lo[i]    ? ld_fwddata_dc5pipe_lo[(8*i)+7:(8*i)] :
                                             ld_byte_hit_wrbuf_lo[i] ? ld_fwddata_wrbuf_lo[(8*i)+7:(8*i)] :
                                                                       ld_fwddata_rdbuf_lo[(8*i)+7:(8*i)];
-      
+
       assign ld_fwddata_hi[(8*i)+7:(8*i)] = ld_byte_dc3hit_hi[i]    ? ld_fwddata_dc3pipe_hi[(8*i)+7:(8*i)] :
                                             ld_byte_dc4hit_hi[i]    ? ld_fwddata_dc4pipe_hi[(8*i)+7:(8*i)] :
                                             ld_byte_dc5hit_hi[i]    ? ld_fwddata_dc5pipe_hi[(8*i)+7:(8*i)] :
@@ -361,7 +363,7 @@ module lsu_bus_intf (
 
    end
 
-   always_comb begin 
+   always_comb begin
       ld_full_hit_lo_dc2 = 1'b1;
       ld_full_hit_hi_dc2 = 1'b1;
       for (int i=0; i<8; i++) begin
@@ -382,7 +384,7 @@ module lsu_bus_intf (
 
    assign {ld_fwddata_dc2_nc[127:32], ld_fwddata_dc2[31:0]} = {ld_fwddata_hi[63:0], ld_fwddata_lo[63:0]} >> (8*lsu_addr_dc2[2:0]);
    assign bus_read_data_dc3[31:0]                           = ld_full_hit_dc3 ? ld_fwddata_dc3[31:0] : ld_read_buffer_data_dc3[31:0];
-	    
+
    // Fifo flops
    rvdff #(.WIDTH(1)) lsu_full_hit_dc3ff (.din(ld_full_hit_dc2), .dout(ld_full_hit_dc3), .clk(lsu_freeze_c2_dc3_clk), .*);
    rvdff #(.WIDTH(32)) lsu_fwddata_dc3ff (.din(ld_fwddata_dc2[31:0]), .dout(ld_fwddata_dc3[31:0]), .clk(lsu_c1_dc3_clk), .*);
@@ -399,7 +401,7 @@ module lsu_bus_intf (
    rvdff #(4) lsu_byten_dc3ff (.*, .din(ldst_byteen_dc2[3:0]), .dout(ldst_byteen_dc3[3:0]), .clk(lsu_freeze_c1_dc3_clk));
    rvdff #(4) lsu_byten_dc4ff (.*, .din(ldst_byteen_dc3[3:0]), .dout(ldst_byteen_dc4[3:0]), .clk(lsu_c1_dc4_clk));
    rvdff #(4) lsu_byten_dc5ff (.*, .din(ldst_byteen_dc4[3:0]), .dout(ldst_byteen_dc5[3:0]), .clk(lsu_c1_dc5_clk));
- 
+
 `ifdef ASSERT_ON
    // Assertion to check ld imprecise error comes with right address
    property lsu_ld_imprecise_error_check;
@@ -422,9 +424,9 @@ module lsu_bus_intf (
                                                   ((lsu_axi_awsize[2:0] == 3'h2) & (lsu_axi_awaddr[1:0] == 2'b0)) |
                                                   ((lsu_axi_awsize[2:0] == 3'h3) & (lsu_axi_awaddr[2:0] == 3'b0)));
    endproperty
-   assert_lsu_write_trxn_aligned: assert property (lsu_axi_write_trxn_aligned) else 
+   assert_lsu_write_trxn_aligned: assert property (lsu_axi_write_trxn_aligned) else
      $display("Assertion lsu_axi_write_trxn_aligned failed: lsu_axi_awvalid=1'b%b, lsu_axi_awsize=3'h%h, lsu_axi_awaddr=32'h%h",lsu_axi_awvalid, lsu_axi_awsize[2:0], lsu_axi_awaddr[31:0]);
-   
+
    // Assertion to check AXI read address is aligned to size
    property lsu_axi_read_trxn_aligned;
      @(posedge lsu_busm_clk) disable iff(~rst_l) lsu_axi_arvalid  |-> ((lsu_axi_arsize[2:0] == 3'h0)                                  |
@@ -432,9 +434,9 @@ module lsu_bus_intf (
                                                   ((lsu_axi_arsize[2:0] == 3'h2) & (lsu_axi_araddr[1:0] == 2'b0)) |
                                                   ((lsu_axi_arsize[2:0] == 3'h3) & (lsu_axi_araddr[2:0] == 3'b0)));
    endproperty
-   assert_lsu_read_trxn_aligned: assert property (lsu_axi_read_trxn_aligned) else 
+   assert_lsu_read_trxn_aligned: assert property (lsu_axi_read_trxn_aligned) else
      $display("Assertion lsu_axi_read_trxn_aligned failed: lsu_axi_arvalid=1'b%b, lsu_axi_arsize=3'h%h, lsu_axi_araddr=32'h%h",lsu_axi_arvalid, lsu_axi_arsize[2:0], lsu_axi_araddr[31:0]);
-   
+
    // Assertion to check cmd valid stays stable during entire bus clock
    property lsu_axi_awvalid_stable;
       @(posedge clk) disable iff(~rst_l)  (lsu_axi_awvalid != $past(lsu_axi_awvalid)) |-> $past(lsu_bus_clk_en);

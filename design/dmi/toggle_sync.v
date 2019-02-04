@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright 2019 Western Digital Corporation or its affiliates.
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 // http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,7 +16,7 @@
 //
 //  Copyright Western Digital, 2019
 //  Owner : Anusha Narayanamoorthy
-//  Description:  
+//  Description:
 //                Toggle synchronizer
 //
 //-------------------------------------------------------------------------------------
@@ -24,7 +24,7 @@
 module toggle_sync(
   input  src_rst_n,  // Source reset
   input  src_clk,  // Source clock
-  input  dst_clk,  // Destination clock 
+  input  dst_clk,  // Destination clock
   input  dst_rst_n,  // Destination reset
   input  src_enb,  // Enable signal in Source clock domain
   output  dst_enb  // Enable signal in destination clock domain

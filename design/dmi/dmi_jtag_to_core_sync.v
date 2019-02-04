@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright 2019 Western Digital Corporation or its affiliates.
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 // http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,7 +16,7 @@
 //
 //  Copyright Western Digital, 2019
 //  Owner : Anusha Narayanamoorthy
-//  Description:  
+//  Description:
 //                This module Synchronizes the signals between JTAG (TCK) and
 //                processor (Core_clk)
 //
@@ -60,11 +60,11 @@ module dmi_jtag_to_core_sync (
   reg  [1:0]                   sts_opc;
   reg  [1:0]                   reg_opcod;
 
-  
+
   wire                         c_rd_en;
   wire                         c_wr_en;
    wire 		       j_wr_en, j_rd_en, reg_en_sig, j_status;
-   
+
 
   //Assign statements
   assign j_wr_en = (wr_intf & wr_enab);
@@ -85,7 +85,7 @@ module dmi_jtag_to_core_sync (
   toggle_sync sync_rd_en(
     .src_rst_n(trst_n),  // Source domain reset
     .src_clk(tck),  // Source clock
-    .dst_clk(core_clk),  // Destination clock 
+    .dst_clk(core_clk),  // Destination clock
     .dst_rst_n(core_rst_n),  // Destination reset
     .src_enb(j_rd_en),  // Enable signal in Source clock domain
     .dst_enb(c_rd_en)  // Enable signal in destination clock domain
@@ -97,7 +97,7 @@ module dmi_jtag_to_core_sync (
   toggle_sync sync_wr_enb(
     .src_rst_n(trst_n),  // Source domain reset
     .src_clk(tck),  // Source clock
-    .dst_clk(core_clk),  // Destination clock 
+    .dst_clk(core_clk),  // Destination clock
     .dst_rst_n(core_rst_n),  // Destination reset
     .src_enb(j_wr_en),  // Enable signal in Source clock domain
     .dst_enb(c_wr_en)  // Enable signal in destination clock domain
@@ -110,14 +110,14 @@ module dmi_jtag_to_core_sync (
       c_wr_data <= 32'b0;
     else if (wr_enab)
       c_wr_data <= j_wr_data;
-    
+
   // Storing wr_addr when wr_enab is available
   always @ (posedge tck or negedge trst_n)
     if(!trst_n)
       c_wr_addr <= 32'b0;
     else if (wr_intf)
       c_wr_addr <= j_wr_addr;
-    
+
 
   // Storing read data when rd_ack is available
   always @ (posedge core_clk or negedge core_rst_n)
@@ -131,9 +131,9 @@ module dmi_jtag_to_core_sync (
   always @ (posedge core_clk or negedge core_rst_n)
     if(!core_rst_n)
       d_reg_en <= 1'b0;
-    else 
+    else
       d_reg_en <= reg_en_sig;
-  
+
 
   // Sts opcode assignment in core clock domain to sample in tck
   always @ (posedge core_clk or negedge core_rst_n)
@@ -149,7 +149,7 @@ module dmi_jtag_to_core_sync (
   toggle_sync sync_status(
     .src_rst_n(core_rst_n),  // Source domain reset
     .src_clk(core_clk),  // Source clock
-    .dst_clk(tck),  // Destination clock 
+    .dst_clk(tck),  // Destination clock
     .dst_rst_n(trst_n),  // Destination reset
     .src_enb(d_reg_en),  // Enable signal in Source clock domain
     .dst_enb(j_status)  // Enable signal in destination clock domain
@@ -171,7 +171,7 @@ module dmi_jtag_to_core_sync (
     else
       reg_opcod <= sig_opcod;
 
-  
+
 
   // State machine for opcode assignment
   always @ (*)

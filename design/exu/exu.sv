@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright 2019 Western Digital Corporation or its affiliates.
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 // http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,6 +15,7 @@
 
 
 module exu
+  import swerv_types::*;
   (
 
    input logic clk,                                                    // Top level clock
@@ -175,7 +176,7 @@ module exu
    output logic [`RV_BHT_GHR_RANGE]  exu_i0_br_fghr_e4,                // to DEC  I0 branch fghr
    output logic        exu_i0_br_ret_e4,                               // to DEC  I0 branch return
    output logic        exu_i0_br_call_e4,                              // to DEC  I0 branch call
-   
+
    output logic [1:0]  exu_i1_br_hist_e4,                              // to DEC  I1 branch history
    output logic [1:0]  exu_i1_br_bank_e4,                              // to DEC  I1 branch bank
    output logic        exu_i1_br_error_e4,                             // to DEC  I1 branch error
@@ -291,15 +292,15 @@ module exu
                                  ({32{ dec_i1_rs1_bypass_en_d}} & i1_rs1_bypass_data_d[31:0]);
 
    assign i1_rs2_d[31:0]       = ({32{~dec_i1_rs2_bypass_en_d}} & gpr_i1_rs2_d[31:0]) |
-                                 ({32{~dec_i1_rs2_bypass_en_d}} & dec_i1_immed_d[31:0]) | 
+                                 ({32{~dec_i1_rs2_bypass_en_d}} & dec_i1_immed_d[31:0]) |
                                  ({32{ dec_i1_rs2_bypass_en_d}} & i1_rs2_bypass_data_d[31:0]);
 
-   assign exu_lsu_rs1_d[31:0]  = ({32{ ~dec_i0_rs1_bypass_en_d &  dec_i0_lsu_d               }} & gpr_i0_rs1_d[31:0]        ) |  
+   assign exu_lsu_rs1_d[31:0]  = ({32{ ~dec_i0_rs1_bypass_en_d &  dec_i0_lsu_d               }} & gpr_i0_rs1_d[31:0]        ) |
                                  ({32{ ~dec_i1_rs1_bypass_en_d & ~dec_i0_lsu_d & dec_i1_lsu_d}} & gpr_i1_rs1_d[31:0]        ) |
                                  ({32{  dec_i0_rs1_bypass_en_d &  dec_i0_lsu_d               }} & i0_rs1_bypass_data_d[31:0]) |
                                  ({32{  dec_i1_rs1_bypass_en_d & ~dec_i0_lsu_d & dec_i1_lsu_d}} & i1_rs1_bypass_data_d[31:0]);
 
-   assign exu_lsu_rs2_d[31:0]  = ({32{ ~dec_i0_rs2_bypass_en_d &  dec_i0_lsu_d               }} & gpr_i0_rs2_d[31:0]        ) |  
+   assign exu_lsu_rs2_d[31:0]  = ({32{ ~dec_i0_rs2_bypass_en_d &  dec_i0_lsu_d               }} & gpr_i0_rs2_d[31:0]        ) |
                                  ({32{ ~dec_i1_rs2_bypass_en_d & ~dec_i0_lsu_d & dec_i1_lsu_d}} & gpr_i1_rs2_d[31:0]        ) |
                                  ({32{  dec_i0_rs2_bypass_en_d &  dec_i0_lsu_d               }} & i0_rs2_bypass_data_d[31:0]) |
                                  ({32{  dec_i1_rs2_bypass_en_d & ~dec_i0_lsu_d & dec_i1_lsu_d}} & i1_rs2_bypass_data_d[31:0]);
@@ -383,7 +384,7 @@ module exu
       i1_predict_newp_d.index[`RV_BTB_ADDR_HI:`RV_BTB_ADDR_LO] = i1_predict_p_d.index[`RV_BTB_ADDR_HI:`RV_BTB_ADDR_LO];
       i1_predict_newp_d.bank[1:0] = i1_predict_p_d.bank[1:0];
 
-   end   
+   end
 
 
    predict_pkt_t i0_predict_p_e1, i0_predict_p_e4;
@@ -391,7 +392,7 @@ module exu
 
    assign exu_pmu_i0_br_misp   = i0_predict_p_e4.misp;
    assign exu_pmu_i0_br_ataken = i0_predict_p_e4.ataken;
-   assign exu_pmu_i0_pc4       = i0_predict_p_e4.pc4 | exu_div_finish;      // divides are always 4B 
+   assign exu_pmu_i0_pc4       = i0_predict_p_e4.pc4 | exu_div_finish;      // divides are always 4B
    assign exu_pmu_i1_br_misp   = i1_predict_p_e4.misp;
    assign exu_pmu_i1_br_ataken = i1_predict_p_e4.ataken;
    assign exu_pmu_i1_pc4       = i1_predict_p_e4.pc4;
@@ -472,19 +473,19 @@ module exu
 
    rvdffe #(76) i0_src_e1_ff (.*,
                               .en(i0_e1_data_en),
-                              .din( {i0_rs1_d[31:0], i0_rs2_d[31:0], dec_i0_br_immed_d[12:1]}), 
+                              .din( {i0_rs1_d[31:0], i0_rs2_d[31:0], dec_i0_br_immed_d[12:1]}),
                               .dout({i0_rs1_e1[31:0], i0_rs2_e1[31:0], i0_br_immed_e1[12:1]})
                               );
 
-   rvdffe #(76) i0_src_e2_ff (.*, 
+   rvdffe #(76) i0_src_e2_ff (.*,
                               .en(i0_e2_data_en),
-                              .din( {i0_rs1_e1[31:0], i0_rs2_e1[31:0], i0_br_immed_e1[12:1]}), 
+                              .din( {i0_rs1_e1[31:0], i0_rs2_e1[31:0], i0_br_immed_e1[12:1]}),
                               .dout({i0_rs1_e2[31:0], i0_rs2_e2[31:0], i0_br_immed_e2[12:1]})
                               );
 
-   rvdffe #(76) i0_src_e3_ff (.*, 
+   rvdffe #(76) i0_src_e3_ff (.*,
                               .en(i0_e3_data_en),
-                              .din( {i0_rs1_e2_final[31:0], i0_rs2_e2_final[31:0], i0_br_immed_e2[12:1]}), 
+                              .din( {i0_rs1_e2_final[31:0], i0_rs2_e2_final[31:0], i0_br_immed_e2[12:1]}),
                               .dout({i0_rs1_e3[31:0], i0_rs2_e3[31:0], i0_br_immed_e3[12:1]})
                               );
 
@@ -492,19 +493,19 @@ module exu
 
    rvdffe #(76) i1_src_e1_ff (.*,
                               .en(i1_e1_data_en),
-                              .din( {i1_rs1_d[31:0], i1_rs2_d[31:0], dec_i1_br_immed_d[12:1]}), 
+                              .din( {i1_rs1_d[31:0], i1_rs2_d[31:0], dec_i1_br_immed_d[12:1]}),
                               .dout({i1_rs1_e1[31:0], i1_rs2_e1[31:0], i1_br_immed_e1[12:1]})
                               );
 
-   rvdffe #(76) i1_src_e2_ff (.*,  
+   rvdffe #(76) i1_src_e2_ff (.*,
                               .en(i1_e2_data_en),
-                              .din( {i1_rs1_e1[31:0], i1_rs2_e1[31:0], i1_br_immed_e1[12:1]}), 
+                              .din( {i1_rs1_e1[31:0], i1_rs2_e1[31:0], i1_br_immed_e1[12:1]}),
                               .dout({i1_rs1_e2[31:0], i1_rs2_e2[31:0], i1_br_immed_e2[12:1]})
                               );
 
-   rvdffe #(76) i1_src_e3_ff (.*,  
+   rvdffe #(76) i1_src_e3_ff (.*,
                               .en(i1_e3_data_en),
-                              .din( {i1_rs1_e2_final[31:0], i1_rs2_e2_final[31:0], i1_br_immed_e2[12:1]}), 
+                              .din( {i1_rs1_e2_final[31:0], i1_rs2_e2_final[31:0], i1_br_immed_e2[12:1]}),
                               .dout({i1_rs1_e3[31:0], i1_rs2_e3[31:0], i1_br_immed_e3[12:1]})
                               );
 
@@ -537,7 +538,7 @@ module exu
    assign i1_taken_e1= (i1_ataken_e1 & dec_i1_alu_decode_e1) | (i1_predict_p_e1.hist[1] & ~dec_i1_alu_decode_e1);
 
    assign ghr_e1_ns[`RV_BHT_GHR_RANGE] = ( ({`RV_BHT_GHR_SIZE{~dec_tlu_flush_lower_wb & i0_valid_e1 & (i0_predict_p_e1.misp | ~i1_valid_e1)}} & {ghr_e1[`RV_BHT_GHR_SIZE-2:0], i0_taken_e1}) |
-`ifdef RV_BHT_GHR_SIZE_2                                           
+`ifdef RV_BHT_GHR_SIZE_2
                                            ({`RV_BHT_GHR_SIZE{~dec_tlu_flush_lower_wb & i0_valid_e1 & ~i0_predict_p_e1.misp &  i1_valid_e1}} & {                              i0_taken_e1, i1_taken_e1}) |
 `else
                                            ({`RV_BHT_GHR_SIZE{~dec_tlu_flush_lower_wb & i0_valid_e1 & ~i0_predict_p_e1.misp &  i1_valid_e1}} & {ghr_e1[`RV_BHT_GHR_SIZE-3:0], i0_taken_e1, i1_taken_e1}) |
@@ -555,7 +556,7 @@ module exu
    assign i0_valid_e4 = dec_tlu_i0_valid_e4 & ((i0_predict_p_e4.valid) | i0_predict_p_e4.misp);
    assign i1_pred_valid_e4 = dec_tlu_i1_valid_e4 & ((i1_predict_p_e4.valid) | i1_predict_p_e4.misp) & ~exu_i0_flush_upper_e4;
    assign ghr_e4_ns[`RV_BHT_GHR_RANGE]  = ( ({`RV_BHT_GHR_SIZE{i0_valid_e4 & (i0_predict_p_e4.misp | ~i1_pred_valid_e4)}} & {ghr_e4[`RV_BHT_GHR_SIZE-2:0], i0_predict_p_e4.ataken}) |
-`ifdef RV_BHT_GHR_SIZE_2                                           
+`ifdef RV_BHT_GHR_SIZE_2
                                             ({`RV_BHT_GHR_SIZE{i0_valid_e4  & ~i0_predict_p_e4.misp &  i1_pred_valid_e4}} & {                              i0_predict_p_e4.ataken, i1_predict_p_e4.ataken}) |
 `else
                                             ({`RV_BHT_GHR_SIZE{i0_valid_e4  & ~i0_predict_p_e4.misp &  i1_pred_valid_e4}} & {ghr_e4[`RV_BHT_GHR_SIZE-3:0], i0_predict_p_e4.ataken, i1_predict_p_e4.ataken}) |
@@ -563,12 +564,12 @@ module exu
                                             ({`RV_BHT_GHR_SIZE{~i0_valid_e4 & ~i0_predict_p_e4.br_error & i1_pred_valid_e4}} & {ghr_e4[`RV_BHT_GHR_SIZE-2:0], i1_predict_p_e4.ataken}) |
                                             ({`RV_BHT_GHR_SIZE{~i0_valid_e4 & ~i1_pred_valid_e4}} & ghr_e4[`RV_BHT_GHR_RANGE]) );
 
-   rvdff #(`RV_BHT_GHR_SIZE) e4ghrff (.*, .clk(active_clk), .din({ghr_e4_ns[`RV_BHT_GHR_RANGE]}), 
+   rvdff #(`RV_BHT_GHR_SIZE) e4ghrff (.*, .clk(active_clk), .din({ghr_e4_ns[`RV_BHT_GHR_RANGE]}),
                                       .dout({ghr_e4[`RV_BHT_GHR_RANGE]}));
-   rvdff #(1)           e4ghrflushff (.*, .clk(active_clk), .din({exu_flush_final}), 
+   rvdff #(1)           e4ghrflushff (.*, .clk(active_clk), .din({exu_flush_final}),
                                       .dout({exu_flush_final_f}));
 
-   // RV_NO_SECONDARY_ALU {{ 
+   // RV_NO_SECONDARY_ALU {{
 `ifdef RV_NO_SECONDARY_ALU
 
    rvdffe #($bits(predict_pkt_t)) i0_pp_e4_ff (.*, .en(i0_e4_ctl_en), .din(i0_pp_e4_in),.dout(i0_predict_p_e4) );
@@ -585,7 +586,7 @@ module exu
    assign exu_i1_flush_path_e4[31:1] = '0;
    assign i1_alu_pc_nc[31:1]         = '0;
    assign i1_pred_correct_lower_e4   = '0;
-   
+
 `else
 
    exu_alu_ctl i0_alu_e4 (.*,
@@ -714,7 +715,7 @@ module exu
                                       .din({
                                             exu_i0_flush_path_e1[31:1],
                                             exu_i0_flush_upper_e1}),
-   
+
                                       .dout({
                                              i0_flush_path_upper_e2[31:1],
                                              exu_i0_flush_upper_e2})
@@ -823,12 +824,12 @@ module exu
    assign i0_flush_path_e4_eff[31:1] = (i0_sec_decode_e4) ? exu_i0_flush_path_e4[31:1] : i0_flush_path_upper_e4[31:1];
 
 
-   assign npc_e4[31:1] = (i1_valid_e4_eff) ? ((i1_pred_correct_e4_eff) ? pred_correct_npc_e4[31:1] : i1_flush_path_e4_eff[31:1]) : 
+   assign npc_e4[31:1] = (i1_valid_e4_eff) ? ((i1_pred_correct_e4_eff) ? pred_correct_npc_e4[31:1] : i1_flush_path_e4_eff[31:1]) :
                          ((i0_pred_correct_e4_eff) ? pred_correct_npc_e4[31:1] : i0_flush_path_e4_eff[31:1]);
 
 
    assign exu_npc_e4[31:1] = (div_finish_early) ? exu_i0_flush_path_e1[31:1] :
-                             (exu_div_finish)   ? div_npc[31:1]              : 
+                             (exu_div_finish)   ? div_npc[31:1]              :
                              npc_e4[31:1];
 
    // remember the npc of the divide

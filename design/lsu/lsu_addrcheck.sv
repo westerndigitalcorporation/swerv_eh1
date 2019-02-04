@@ -22,7 +22,9 @@
 // Comments:
 //
 //********************************************************************************
-module lsu_addrcheck (
+module lsu_addrcheck
+  import swerv_types::*;
+  (
    input logic         lsu_freeze_c2_dc2_clk,       // clock
    input logic         lsu_freeze_c2_dc3_clk,
    input logic 	       rst_l,                       // reset

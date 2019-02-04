@@ -63,7 +63,9 @@ function automatic logic [2:0] get_wrbuf_addr;
 endfunction
 
 
-module lsu_bus_write_buffer (
+module lsu_bus_write_buffer
+  import swerv_types::*;
+  (
    input logic                          lsu_wrbuf_c1_clk,
    input logic                          lsu_freeze_c2_dc3_clk,
    input logic                          lsu_c2_dc4_clk,

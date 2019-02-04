@@ -21,11 +21,12 @@
 //
 //********************************************************************************
 `include "build.h"
-//`include "def.sv"
-module swerv_wrapper  (
-   input logic 			     clk,
-   input logic 			     rst_l,
-   input logic [31:1] 		     rst_vec,
+module swerv_wrapper
+  import swerv_types::*;
+ (
+   input logic                       clk,
+   input logic                       rst_l,
+   input logic [31:1]                rst_vec,
    input logic                       nmi_int,
    input logic [31:1]                nmi_vec,			    
 

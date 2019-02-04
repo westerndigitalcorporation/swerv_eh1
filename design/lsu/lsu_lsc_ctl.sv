@@ -25,7 +25,9 @@
 // DC1 -> DC2 -> DC3 -> DC4 (Commit)
 // 
 //********************************************************************************
-module lsu_lsc_ctl (
+module lsu_lsc_ctl
+  import swerv_types::*;
+(
    input logic         rst_l,
    // clocks per pipe
    input logic        lsu_c1_dc4_clk,                            

@@ -28,6 +28,7 @@
 //********************************************************************************
     
 module dec
+  import swerv_types::*;
   (
    input logic clk,
    input logic free_clk,

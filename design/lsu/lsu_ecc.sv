@@ -25,7 +25,8 @@
 // DC1 -> DC2 -> DC3 -> DC4 (Commit)
 // 
 //********************************************************************************
-module lsu_ecc 
+module lsu_ecc
+  import swerv_types::*;
 (
 
    input logic        lsu_c2_dc4_clk,                      // clocks

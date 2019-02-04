@@ -156,7 +156,7 @@ module tb_top ( input logic core_clk, input logic reset_l);
 `ifndef VERILATOR
      repeat (5) @(posedge core_clk);
      reset_l = 1;
-     #4500 $finish;
+     #4500 $display("");$finish;
 `endif
    end
 

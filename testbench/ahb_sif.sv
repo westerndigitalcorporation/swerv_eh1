@@ -80,7 +80,11 @@ always @(posedge HCLK or negedge HRESETn) begin
   end
 end
 
+`ifdef VERILATOR
 always @(posedge HCLK or negedge HRESETn) begin
+`else
+always @(negedge HCLK or negedge HRESETn) begin
+`endif
   if(~HRESETn) begin
     Last_HADDR  <= #1 32'b0;
   end else begin

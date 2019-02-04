@@ -64,8 +64,25 @@ verilator-run:
 	cp ${RV_ROOT}/testbench/hex/*.hex .
 	./obj_dir/Vtb_top
 
+irun-run: 
+	snapshot=ahb
+	${RV_ROOT}/configs/swerv.config -snapshot=$(snapshot) -ahb
+	cp ${RV_ROOT}/testbench/hex/*.hex .
+	irun -64bit -ida -access +rw -q -sv -sysv  -nowarn CUVIHR -nclibdirpath ${PWD} -nclibdirname swerv.build \
+		-incdir ${RV_ROOT}/design/lib -incdir ${RV_ROOT}/design/include -incdir ${RV_ROOT}/design/dmi -vlog_ext +.vh\
+		${RV_ROOT}/configs/snapshots/$(snapshot)/common_defines.vh ${RV_ROOT}/design/include/def.sv \
+		-top tb_top  ${RV_ROOT}/testbench/tb_top.sv -I${RV_ROOT}/testbench ${RV_ROOT}/testbench/ahb_sif.sv\
+		-incdir ${RV_ROOT}/configs/snapshots/$(snapshot) -f ${RV_ROOT}/design/flist.vcs -snapshot default
+
+vcs-run: ${RV_ROOT}/configs/snapshots/$(snapshot)/common_defines.vh
+	cp ${RV_ROOT}/testbench/hex/*.hex .
+	vcs -full64 -assert svaext -sverilog +define+RV_OPENSOURCE +error+500 +incdir+${RV_ROOT}/design/lib +incdir+${RV_ROOT}/design/include \
+		+incdir+${RV_ROOT}/design/dmi +incdir+${RV_ROOT}/configs/snapshots/$(snapshot)  +libext+.v ${RV_ROOT}/configs/snapshots/$(snapshot)/common_defines.vh \
+		${RV_ROOT}/design/include/def.sv -f ${RV_ROOT}/design/flist.vcs ${RV_ROOT}/testbench/tb_top.sv -I${RV_ROOT}/testbench ${RV_ROOT}/testbench/ahb_sif.sv -l vcs.log
+	./simv
+
 help:
 	@echo Make sure the environment variable RV_ROOT is set.
-	@echo Possible targets: verilator vcs irun help clean all verilator-run
+	@echo Possible targets: verilator vcs irun help clean all verilator-run irun-run vcs-run
 
-.PHONY: help clean verilator vcs irun verilator-run
+.PHONY: help clean verilator vcs irun verilator-run irun-run  vcs-run

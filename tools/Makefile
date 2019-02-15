@@ -24,51 +24,62 @@ ifeq ($(strip $(snapshot)),)
 	snapshot = default
 endif
 
+# Allow tool override
+SWERV_CONFIG = ${RV_ROOT}/configs/swerv.config
+IRUN = irun
+VCS = vcs
+VERILATOR = verilator
+
 defines = ${RV_ROOT}/configs/snapshots/$(snapshot)/common_defines.vh ${RV_ROOT}/design/include/def.sv
 includes = -I${RV_ROOT}/design/include -I${RV_ROOT}/design/lib -I${RV_ROOT}/design/dmi -I${RV_ROOT}/configs/snapshots/$(snapshot)
+
 # CFLAGS for verilator generated Makefiles. Without -std=c++11 it complains for `auto` variables
 CFLAGS += "-std=c++11"
+# Optimization for better performance; alternative is nothing for slower runtime (faster compiles)
+# -O2 for faster runtime (slower compiles), or -O for balance.
+VERILATOR_MAKE_FLAGS = OPT_FAST="-O"
 
+# Targets
 all: clean verilator
 
 clean:
 	rm -rf obj_dir
 
 verilator: ${RV_ROOT}/configs/snapshots/$(snapshot)/common_defines.vh
-	verilator '-UASSERT_ON' --cc -CFLAGS ${CFLAGS} $(defines) $(includes) ${RV_ROOT}/configs/snapshots/$(snapshot)/common_defines.vh \
+	$(VERILATOR) '-UASSERT_ON' --cc -CFLAGS ${CFLAGS} $(defines) $(includes) ${RV_ROOT}/configs/snapshots/$(snapshot)/common_defines.vh \
 		-f ${RV_ROOT}/design/flist.verilator --top-module swerv_wrapper
-	make -C obj_dir/ -f Vswerv_wrapper.mk
+	$(MAKE) -C obj_dir/ -f Vswerv_wrapper.mk $(VERILATOR_MAKE_FLAGS)
 
 vcs: ${RV_ROOT}/configs/snapshots/$(snapshot)/common_defines.vh
-	vcs -full64 -assert svaext -sverilog +define+RV_OPENSOURCE +error+500 +incdir+${RV_ROOT}/design/lib +incdir+${RV_ROOT}/design/include \
+	$(VCS) -full64 -assert svaext -sverilog +define+RV_OPENSOURCE +error+500 +incdir+${RV_ROOT}/design/lib +incdir+${RV_ROOT}/design/include \
 		+incdir+${RV_ROOT}/design/dmi +incdir+${RV_ROOT}/configs/snapshots/$(snapshot)  +libext+.v ${RV_ROOT}/configs/snapshots/$(snapshot)/common_defines.vh \
 		${RV_ROOT}/design/include/def.sv -f ${RV_ROOT}/design/flist.vcs -l vcs.log
 
 irun: ${RV_ROOT}/configs/snapshots/$(snapshot)/common_defines.vh
-	irun -64bit -elaborate -ida -access +rw -q -sv -sysv  -nowarn CUVIHR -nclibdirpath ${PWD} -nclibdirname swerv.build \
+	$(IRUN) -64bit -elaborate -ida -access +rw -q -sv -sysv  -nowarn CUVIHR -nclibdirpath ${PWD} -nclibdirname swerv.build \
 		-incdir ${RV_ROOT}/design/lib -incdir ${RV_ROOT}/design/include -incdir ${RV_ROOT}/design/dmi -vlog_ext +.vh\
 		${RV_ROOT}/configs/snapshots/$(snapshot)/common_defines.vh ${RV_ROOT}/design/include/def.sv \
 		-incdir ${RV_ROOT}/configs/snapshots/$(snapshot) -f ${RV_ROOT}/design/flist.vcs -elaborate  -snapshot default
 
 ${RV_ROOT}/configs/snapshots/$(snapshot)/common_defines.vh:
-	${RV_ROOT}/configs/swerv.config -snapshot=$(snapshot)
+	$(SWERV_CONFIG) -snapshot=$(snapshot)
 
 verilator-run: 
 	snapshot=ahb
-	${RV_ROOT}/configs/swerv.config -snapshot=$(snapshot) -ahb
-	verilator '-UASSERT_ON' --cc -CFLAGS ${CFLAGS} $(defines) $(includes) ${RV_ROOT}/configs/snapshots/$(snapshot)/common_defines.vh \
+	$(SWERV_CONFIG) -snapshot=$(snapshot) -ahb
+	$(VERILATOR) '-UASSERT_ON' --cc -CFLAGS ${CFLAGS} $(defines) $(includes) ${RV_ROOT}/configs/snapshots/$(snapshot)/common_defines.vh \
 		${RV_ROOT}/testbench/tb_top.sv -I${RV_ROOT}/testbench \
 		-f ${RV_ROOT}/design/flist.verilator --top-module tb_top -exe test_tb_top.cpp --trace --autoflush
 	cp ${RV_ROOT}/testbench/test_tb_top.cpp obj_dir/
-	make -C obj_dir/ -f Vtb_top.mk
+	$(MAKE) -C obj_dir/ -f Vtb_top.mk $(VERILATOR_MAKE_FLAGS)
 	cp ${RV_ROOT}/testbench/hex/*.hex .
 	./obj_dir/Vtb_top
 
 irun-run: 
 	snapshot=ahb
-	${RV_ROOT}/configs/swerv.config -snapshot=$(snapshot) -ahb
+	$(SWERV_CONFIG) -snapshot=$(snapshot) -ahb
 	cp ${RV_ROOT}/testbench/hex/*.hex .
-	irun -64bit -ida -access +rw -q -sv -sysv  -nowarn CUVIHR -nclibdirpath ${PWD} -nclibdirname swerv.build \
+	$(IRUN) -64bit -ida -access +rw -q -sv -sysv  -nowarn CUVIHR -nclibdirpath ${PWD} -nclibdirname swerv.build \
 		-incdir ${RV_ROOT}/design/lib -incdir ${RV_ROOT}/design/include -incdir ${RV_ROOT}/design/dmi -vlog_ext +.vh\
 		${RV_ROOT}/configs/snapshots/$(snapshot)/common_defines.vh ${RV_ROOT}/design/include/def.sv \
 		-top tb_top  ${RV_ROOT}/testbench/tb_top.sv -I${RV_ROOT}/testbench ${RV_ROOT}/testbench/ahb_sif.sv\
@@ -76,7 +87,7 @@ irun-run:
 
 vcs-run: ${RV_ROOT}/configs/snapshots/$(snapshot)/common_defines.vh
 	cp ${RV_ROOT}/testbench/hex/*.hex .
-	vcs -full64 -assert svaext -sverilog +define+RV_OPENSOURCE +error+500 +incdir+${RV_ROOT}/design/lib +incdir+${RV_ROOT}/design/include \
+	$(VCS) -full64 -assert svaext -sverilog +define+RV_OPENSOURCE +error+500 +incdir+${RV_ROOT}/design/lib +incdir+${RV_ROOT}/design/include \
 		+incdir+${RV_ROOT}/design/dmi +incdir+${RV_ROOT}/configs/snapshots/$(snapshot)  +libext+.v ${RV_ROOT}/configs/snapshots/$(snapshot)/common_defines.vh \
 		${RV_ROOT}/design/include/def.sv -f ${RV_ROOT}/design/flist.vcs ${RV_ROOT}/testbench/tb_top.sv -I${RV_ROOT}/testbench ${RV_ROOT}/testbench/ahb_sif.sv -l vcs.log
 	./simv

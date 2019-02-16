@@ -22,7 +22,10 @@ Files under the [tools](tools/) directory may be available under a different lic
     │   └── lsu                 #   Load/Store
     ├── docs
     ├── tools                   # Scripts/Makefiles
-
+    └── testbench               # (Very) simple testbench
+        ├── asm                 #   Example assembly files
+        └── hex                 #   Canned demo hex files
+ 
 ## Dependencies
 
 - Verilator **(3.926 or later)** must be installed on the system
@@ -99,12 +102,28 @@ WORLD" to the bus.
 You can re-execute using
 
     ./obj_dir/Vtb_top
+
     Start of sim
-    HELLO WORLD
+
+    ------------------------------
+    Hello World from SweRV @WDC !!
+    ------------------------------
+
+    Finished : minstret = 389, mcycle = 1658
+
     End of sim
 
 A vcd file `sim.vcd` is created which can be browsed by gtkwave or similar waveform viewers. `trace_port.csv` contains a log of
 the trace port.
+
+The Makefile allows you to specify different assembly files from command line
+     
+    make -f $RV_ROOT/tools/Makefile verilator-run ASM_TEST=my_hellow_world.s ASM_TEST_DIR=/path/to/dir
+
+If you change only the assembly files, you do not need to rebuild verilator, just specify the target as `program.hex` :
+
+    make -f $RV_ROOT/tools/Makefile program.hex ASM_TEST=my_hello_world.s ASM_TEST_DIR=/path/to/dir
+    ./obj_dir/Vtb_top
 
 ----
 Western Digital, the Western Digital logo, G-Technology, SanDisk, Tegile, Upthere, WD, SweRV Core, SweRV ISS, and OmniXtend are registered trademarks or trademarks of Western Digital Corporation or its affiliates in the US and/or other countries. All other marks are the property of their respective owners.

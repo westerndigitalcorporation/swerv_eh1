@@ -33,7 +33,7 @@ double sc_time_stamp () {
 //int main(int argc, char* argv[]) {
 int main(int argc, char** argv) {
 
-  std::cout << "Start of sim" << std::endl;
+  std::cout << "\nStart of sim\n" << std::endl;
   Verilated::commandArgs(argc, argv);
 
   Vtb_top* tb = new Vtb_top;
@@ -47,7 +47,7 @@ int main(int argc, char** argv) {
 
   
   // Simulate
-  for(auto i=0; i<200; ++i){
+  for(auto i=0; i<200000; ++i){
     clkCnt++;
     if(i<10)  {
        tb->reset_l  = 0;
@@ -61,9 +61,22 @@ int main(int argc, char** argv) {
       tb->eval();
     }
 
+    if (tb->finished) {
+      tfp->close();
+      break;
+    }
+
+  }
+
+  for(auto i=0; i<100; ++i){
+    clkCnt++;
+    for (auto clk=0; clk<2; clk++) {
+      tfp->dump (2*i+clk);
+      tb->core_clk = !tb->core_clk;
+      tb->eval();
+    }
   }
  
-  tfp->close();
   std::cout << "\nEnd of sim" << std::endl;
   exit(EXIT_SUCCESS);
 

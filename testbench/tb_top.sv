@@ -16,7 +16,7 @@
 `ifndef VERILATOR
 module tb_top;
 `else
-module tb_top ( input logic core_clk, input logic reset_l);
+module tb_top ( input logic core_clk, input logic reset_l, output finished);
 `endif
 
 `ifndef VERILATOR
@@ -92,10 +92,13 @@ module tb_top ( input logic core_clk, input logic reset_l);
 
    logic        [31:0]                  cycleCnt       ;
    logic                                mailbox_data_val;
+   logic                                finished;
    //assign mailbox_write = &{i_ahb_lsu.Write, i_ahb_lsu.Last_HADDR==32'hD0580000, i_ahb_lsu.HRESETn==1};
    assign mailbox_write = i_ahb_lsu.mailbox_write;
    //assign mailbox_write = i_ahb_lsu.mailbox_write & !core_clk;
-   assign mailbox_data_val = (i_ahb_lsu.WriteData[7:0] > 8'h1f) & (i_ahb_lsu.WriteData[7:0] < 8'h7f);
+   assign mailbox_data_val = (i_ahb_lsu.WriteData[7:0] > 8'h5) & (i_ahb_lsu.WriteData[7:0] < 8'h7f);
+
+   assign finished = finished | &{i_ahb_lsu.mailbox_write, (i_ahb_lsu.WriteData[7:0] == 8'hff)};
 
 `ifndef VERILATOR
    `define FORCE force
@@ -120,19 +123,27 @@ module tb_top ( input logic core_clk, input logic reset_l);
 
    always @(posedge core_clk) begin
       //if(cycleCnt == 32'h800)
-      if(cycleCnt == 32'h800)
-        $finish;
+        if(cycleCnt == 32'h800) begin
+            $display ("Hit max cycle count.. stopping");
+            $finish;
+        end
    end
 
 
    always @(negedge mailbox_write)
      if( mailbox_data_val ) begin
-       $fwrite(fd,"%c", i_ahb_lsu.WriteData[7:0]);
-       $write("%c", i_ahb_lsu.WriteData[7:0]);
+           $fwrite(fd,"%c", i_ahb_lsu.WriteData[7:0]);
+           $write("%c", i_ahb_lsu.WriteData[7:0]);
+     end
+
+   always @(posedge finished) begin
+        $display("\n\nFinished : minstret = %0d, mcycle = %0d", rvtop.swerv.dec.tlu.minstretl[31:0],rvtop.swerv.dec.tlu.mcyclel[31:0]);
      end
 
    always @(posedge core_clk)
-     $fwrite(tp,"%b,%h,%h,%0h,%0h,3,%b,%h,%h,%b\n", rvtop.trace_rv_i_valid_ip, rvtop.trace_rv_i_address_ip[63:32], rvtop.trace_rv_i_address_ip[31:0], rvtop.trace_rv_i_insn_ip[63:32], rvtop.trace_rv_i_insn_ip[31:0],rvtop.trace_rv_i_exception_ip,rvtop.trace_rv_i_ecause_ip,rvtop.trace_rv_i_tval_ip,rvtop.trace_rv_i_interrupt_ip);
+       if (rvtop.trace_rv_i_valid_ip !== 0) begin
+        $fwrite(tp,"%b,%h,%h,%0h,%0h,3,%b,%h,%h,%b\n", rvtop.trace_rv_i_valid_ip, rvtop.trace_rv_i_address_ip[63:32], rvtop.trace_rv_i_address_ip[31:0], rvtop.trace_rv_i_insn_ip[63:32], rvtop.trace_rv_i_insn_ip[31:0],rvtop.trace_rv_i_exception_ip,rvtop.trace_rv_i_ecause_ip,rvtop.trace_rv_i_tval_ip,rvtop.trace_rv_i_interrupt_ip);
+        end
 
    initial begin
 
@@ -174,9 +185,9 @@ end
    swerv_wrapper rvtop (
             .rst_l              ( reset_l       ),
             .clk                ( core_clk      ),
-            .rst_vec            ( 31'h80000000  ),
+            .rst_vec            ( 31'h40000000  ),
             .nmi_int            ( nmi_int       ),
-            .nmi_vec            ( 31'hee000000  ),
+            .nmi_vec            ( 31'h77000000  ),
 
             .haddr              ( ic_haddr      ),
             .hburst             ( ic_hburst     ),

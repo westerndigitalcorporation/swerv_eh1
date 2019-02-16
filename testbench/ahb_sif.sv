@@ -33,7 +33,7 @@ module ahb_sif (
 
 );
 
-localparam MEM_SIZE_DW = 4096;
+localparam MEM_SIZE_DW = 8192;
 localparam MAILBOX_ADDR = 32'hD0580000;
 
 logic Last_HSEL;
@@ -46,7 +46,7 @@ logic [63:0] Next_HRDATA;
 logic [63:0] WriteReadData;
 logic [63:0] WriteMask;
 
-logic [63:0] mem [0:MEM_SIZE_DW-1];
+logic [7:0] mem [0:MEM_SIZE_DW-1];
 
 
 // Wires
@@ -60,12 +60,19 @@ wire Read                       = &{     HSEL,       ~HWRITE,      HTRANS[1]};
 
 wire mailbox_write   = &{Write, Last_HADDR==MAILBOX_ADDR, HRESETn==1};
 wire Next_HWRITE     = |{HTRANS} ? HWRITE : Last_HWRITE;
-wire [63:0] mem_dout =  mem[Last_HADDR[14:3]];
+wire [63:0] mem_dout =  {mem[{Last_HADDR[12:3],3'b0}+7],mem[{Last_HADDR[12:3],3'b0}+6],mem[{Last_HADDR[12:3],3'b0}+5],mem[{Last_HADDR[12:3],3'b0}+4],mem[{Last_HADDR[12:3],3'b0}+3],mem[{Last_HADDR[12:3],3'b0}+2],mem[{Last_HADDR[12:3],3'b0}+1],mem[{Last_HADDR[12:3],3'b0}]};
 
 
 always @ (posedge HCLK or negedge HRESETn) begin
   if (Write && Last_HADDR == 32'h0) begin
-    mem[Last_HADDR[14:3]] <= #1 { WriteData[63:0] };
+    mem[{Last_HADDR[12:3],3'b0}+7] <= #1 { WriteData[63:56] };
+    mem[{Last_HADDR[12:3],3'b0}+6] <= #1 { WriteData[55:48] };
+    mem[{Last_HADDR[12:3],3'b0}+5] <= #1 { WriteData[47:40] };
+    mem[{Last_HADDR[12:3],3'b0}+4] <= #1 { WriteData[39:32] };
+    mem[{Last_HADDR[12:3],3'b0}+3] <= #1 { WriteData[31:24] };
+    mem[{Last_HADDR[12:3],3'b0}+2] <= #1 { WriteData[23:16] };
+    mem[{Last_HADDR[12:3],3'b0}+1] <= #1 { WriteData[15:08] };
+    mem[{Last_HADDR[12:3],3'b0}+0] <= #1 { WriteData[07:00] };
   end
 end
 
@@ -144,7 +151,14 @@ assign HRDATA = mem_dout;
 
 always @* begin
   if(Last_HSEL) begin
-    WriteReadData = mem[Last_HADDR[14:3]];
+    WriteReadData[07:00] = mem[{Last_HADDR[12:3],3'b0}];
+    WriteReadData[15:08] = mem[{Last_HADDR[12:3],3'b0}+1];
+    WriteReadData[23:16] = mem[{Last_HADDR[12:3],3'b0}+2];
+    WriteReadData[31:24] = mem[{Last_HADDR[12:3],3'b0}+3];
+    WriteReadData[39:32] = mem[{Last_HADDR[12:3],3'b0}+4];
+    WriteReadData[47:40] = mem[{Last_HADDR[12:3],3'b0}+5];
+    WriteReadData[55:48] = mem[{Last_HADDR[12:3],3'b0}+6];
+    WriteReadData[63:56] = mem[{Last_HADDR[12:3],3'b0}+7];
   end
 end
 

@@ -102,14 +102,14 @@ vcs-run: ${RV_ROOT}/configs/snapshots/$(snapshot)/common_defines.vh
 		${RV_ROOT}/design/include/def.sv -f ${RV_ROOT}/design/flist.vcs ${RV_ROOT}/testbench/tb_top.sv -I${RV_ROOT}/testbench ${RV_ROOT}/testbench/ahb_sif.sv -l vcs.log
 	./simv
 
-program.hex: $(ASM_TEST_DIR)/$(ASM_TEST).s
+program.hex: $(ASM_TEST_DIR)/$(ASM_TEST).s ${RV_ROOT}/configs/snapshots/$(snapshot)/common_defines.vh
 	@echo Building $(ASM_TEST)
 ifeq ($(shell which $(GCC_PREFIX)-as),)
 	@echo " !!! No $(GCC_PREFIX)-as in path, using canned hex files !!"
 	cp ${RV_ROOT}/testbench/hex/*.hex .
 else
 	cp $(ASM_TEST_DIR)/$(ASM_TEST).s .
-	$(GCC_PREFIX)-cpp   -I${RV_ROOT}/snapshots/default  $(ASM_TEST).s  > $(ASM_TEST).cpp.s
+	$(GCC_PREFIX)-cpp   -I${RV_ROOT}/configs/snapshots/$(snapshot)  $(ASM_TEST).s  > $(ASM_TEST).cpp.s
 	$(GCC_PREFIX)-as -march=rv32imc $(ASM_TEST).cpp.s -o $(ASM_TEST).o
 	$(GCC_PREFIX)-ld -m elf32lriscv --discard-none -T${RV_ROOT}/testbench/link.ld -o $(ASM_TEST).exe $(ASM_TEST).o
 	$(GCC_PREFIX)-objcopy -O verilog --only-section ".data*" --only-section ".rodata*" $(ASM_TEST).exe data.hex

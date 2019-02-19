@@ -201,7 +201,7 @@ always_comb begin
                     endcase
                 end
     shift_ir:   nsr = {{USER_DR_LENGTH-5{1'b0}},tdi, sr[4:1]};
-    capture_ir: nsr = '1;
+    capture_ir: nsr = {{USER_DR_LENGTH-1{1'b0}},1'b1};
     endcase
 end
 

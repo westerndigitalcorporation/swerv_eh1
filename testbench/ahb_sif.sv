@@ -46,7 +46,7 @@ logic [63:0] Next_HRDATA;
 logic [63:0] WriteReadData;
 logic [63:0] WriteMask;
 
-logic [7:0] mem [0:MEM_SIZE_DW-1];
+bit [7:0] mem [0:MEM_SIZE_DW-1];
 
 
 // Wires

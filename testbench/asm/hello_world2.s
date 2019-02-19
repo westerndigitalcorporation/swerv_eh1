@@ -59,7 +59,9 @@ _finish:
     addi x5, x0, 0xff
     sb x5, 0(x3)
     beq x0, x0, _finish
-    
+.rept 100
+    nop
+.endr
 
 .data
 hw_data:

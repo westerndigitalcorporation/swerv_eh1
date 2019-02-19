@@ -130,7 +130,11 @@ module tb_top ( input logic core_clk, input logic reset_l, output finished);
    end
 
 
+`ifdef VERILATOR
    always @(negedge mailbox_write)
+`else
+   always @(posedge mailbox_write)
+`endif
      if( mailbox_data_val ) begin
            $fwrite(fd,"%c", i_ahb_lsu.WriteData[7:0]);
            $write("%c", i_ahb_lsu.WriteData[7:0]);
@@ -138,6 +142,9 @@ module tb_top ( input logic core_clk, input logic reset_l, output finished);
 
    always @(posedge finished) begin
         $display("\n\nFinished : minstret = %0d, mcycle = %0d", rvtop.swerv.dec.tlu.minstretl[31:0],rvtop.swerv.dec.tlu.mcyclel[31:0]);
+`ifndef VERILATOR
+        $finish;
+`endif
      end
 
    always @(posedge core_clk)
@@ -167,7 +174,7 @@ module tb_top ( input logic core_clk, input logic reset_l, output finished);
 `ifndef VERILATOR
      repeat (5) @(posedge core_clk);
      reset_l = 1;
-     #4500 $display("");$finish;
+     #100000 $display("");$finish;
 `endif
    end
 

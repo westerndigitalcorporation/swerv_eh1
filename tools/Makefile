@@ -85,10 +85,9 @@ verilator-run: program.hex
 	$(MAKE) -C obj_dir/ -f Vtb_top.mk $(VERILATOR_MAKE_FLAGS)
 	./obj_dir/Vtb_top
 
-irun-run: 
+irun-run: program.hex
 	snapshot=ahb
 	$(SWERV_CONFIG) -snapshot=$(snapshot) -ahb
-	cp ${RV_ROOT}/testbench/hex/*.hex .
 	$(IRUN) -64bit -ida -access +rw -q -sv -sysv  -nowarn CUVIHR -nclibdirpath ${PWD} -nclibdirname swerv.build \
 		-incdir ${RV_ROOT}/design/lib -incdir ${RV_ROOT}/design/include -incdir ${RV_ROOT}/design/dmi -vlog_ext +.vh\
 		${RV_ROOT}/configs/snapshots/$(snapshot)/common_defines.vh ${RV_ROOT}/design/include/def.sv \

@@ -63,6 +63,7 @@ verilator: ${RV_ROOT}/configs/snapshots/$(snapshot)/common_defines.vh
 
 vcs: ${RV_ROOT}/configs/snapshots/$(snapshot)/common_defines.vh
 	$(VCS) -full64 -assert svaext -sverilog +define+RV_OPENSOURCE +error+500 +incdir+${RV_ROOT}/design/lib +incdir+${RV_ROOT}/design/include \
+		${RV_ROOT}/configs/snapshots/$(snapshot)/common_defines.vh \
 		+incdir+${RV_ROOT}/design/dmi +incdir+${RV_ROOT}/configs/snapshots/$(snapshot)  +libext+.v ${RV_ROOT}/configs/snapshots/$(snapshot)/common_defines.vh \
 		${RV_ROOT}/design/include/def.sv -f ${RV_ROOT}/design/flist.vcs -l vcs.log
 
@@ -94,9 +95,12 @@ irun-run: program.hex
 		-top tb_top  ${RV_ROOT}/testbench/tb_top.sv -I${RV_ROOT}/testbench ${RV_ROOT}/testbench/ahb_sif.sv\
 		-incdir ${RV_ROOT}/configs/snapshots/$(snapshot) -f ${RV_ROOT}/design/flist.vcs -snapshot default
 
-vcs-run: ${RV_ROOT}/configs/snapshots/$(snapshot)/common_defines.vh
+vcs-run: program.hex
+	snapshot=ahb
+	$(SWERV_CONFIG) -snapshot=$(snapshot) -ahb
 	cp ${RV_ROOT}/testbench/hex/*.hex .
 	$(VCS) -full64 -assert svaext -sverilog +define+RV_OPENSOURCE +error+500 +incdir+${RV_ROOT}/design/lib +incdir+${RV_ROOT}/design/include \
+		${RV_ROOT}/configs/snapshots/$(snapshot)/common_defines.vh \
 		+incdir+${RV_ROOT}/design/dmi +incdir+${RV_ROOT}/configs/snapshots/$(snapshot)  +libext+.v ${RV_ROOT}/configs/snapshots/$(snapshot)/common_defines.vh \
 		${RV_ROOT}/design/include/def.sv -f ${RV_ROOT}/design/flist.vcs ${RV_ROOT}/testbench/tb_top.sv -I${RV_ROOT}/testbench ${RV_ROOT}/testbench/ahb_sif.sv -l vcs.log
 	./simv

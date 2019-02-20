@@ -119,7 +119,6 @@ else
 	$(GCC_PREFIX)-objcopy -O verilog --only-section ".text*" --set-start=0x0 $(ASM_TEST).exe program.hex
 	$(GCC_PREFIX)-objdump -dS $(ASM_TEST).exe > $(ASM_TEST).dis
 	$(GCC_PREFIX)-nm -f posix -C $(ASM_TEST).exe > $(ASM_TEST).tbl
-	cp program.hex data.hex ..
 	@echo Completed building $(ASM_TEST)
 endif
 	

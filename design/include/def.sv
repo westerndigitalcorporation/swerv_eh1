@@ -14,6 +14,8 @@
 // limitations under the License.
 
 // performance monitor stuff
+`ifndef DEFS_SV
+`define DEFS_SV
 
 typedef struct packed {
 		       logic [2:0] trace_rv_i_valid_ip;
@@ -511,3 +513,5 @@ typedef struct packed {
                        logic [`RV_DMA_BUS_TAG-1:0]  axi_rid;
 
                        } dma_axi4_slv_pkt_t;
+
+`endif // DEFS_SV

@@ -29,7 +29,7 @@
     * DMA h-ready addition
     * DMA slave error response enhancements
 
-1. Added memory protection regions
+1. Added memory protection windows
     
 	* Now able to define up to eight instruction fetch windows and up to eight
 	  data load/store windows. See the programmer reference manual for more

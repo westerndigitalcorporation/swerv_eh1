@@ -2,7 +2,7 @@
 
 This repository contains version 1.0 of the SweRV Core<sup>TM</sup>
 design RTL For more up to date versions, pleas refer to the [Chips
-Alliance repository] (https://gitbub.com/chipsalliance/Cores-SweRV)
+Alliance repository](https://gitbub.com/chipsalliance/Cores-SweRV)
 
 ## License
 

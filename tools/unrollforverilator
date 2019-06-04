@@ -1,0 +1,169 @@
+#!/usr/bin/perl
+#use strict;
+#use warnings;
+
+my $RV_ROOT = $ENV{RV_ROOT};
+
+my $TOTAL_INT=$ARGV[0];
+print "// argv=".$ARGV[0]."\n";
+my $NUM_LEVELS;
+if($TOTAL_INT==2){$NUM_LEVELS=1;}
+elsif ($TOTAL_INT==4){$NUM_LEVELS=2;}
+elsif ($TOTAL_INT==8){$NUM_LEVELS=3;}
+elsif ($TOTAL_INT==16){$NUM_LEVELS=4;}
+elsif ($TOTAL_INT==32){$NUM_LEVELS=5;}
+elsif ($TOTAL_INT==64){$NUM_LEVELS=6;}
+elsif ($TOTAL_INT==128){$NUM_LEVELS=7;}
+elsif ($TOTAL_INT==256){$NUM_LEVELS=8;}
+elsif ($TOTAL_INT==512){$NUM_LEVELS=9;}
+elsif ($TOTAL_INT==1024){$NUM_LEVELS=10;}
+else {$NUM_LEVELS=int(log($TOTAL_INT)/log(2))+1;}
+print ("// TOTAL_INT=".$TOTAL_INT." NUM_LEVELS=".$NUM_LEVELS."\n");
+$next_level = 1;
+print ("`ifdef RV_PIC_2CYCLE\n");
+if($TOTAL_INT > 2){
+print ("// LEVEL0\n");
+print ("logic [TOTAL_INT+2:0] [INTPRIORITY_BITS-1:0] level_intpend_w_prior_en_".$next_level.";\n");
+print ("logic [TOTAL_INT+2:0] [ID_BITS-1:0] level_intpend_id_".$next_level.";\n");
+print ("    for (m=0; m<=(TOTAL_INT)/(2**(".$next_level.")) ; m++) begin : COMPARE0\n");
+print ("       if ( m == (TOTAL_INT)/(2**(".$next_level."))) begin \n");
+print ("            assign level_intpend_w_prior_en_".$next_level."[m+1] = '0 ;\n");
+print ("            assign level_intpend_id_".$next_level."[m+1]         = '0 ;\n");
+print ("       end\n");
+print ("       cmp_and_mux  #(\n");
+print ("                      .ID_BITS(ID_BITS),\n");
+print ("                      .INTPRIORITY_BITS(INTPRIORITY_BITS)) cmp_l".$next_level." (\n");
+print ("                      .a_id(level_intpend_id[0][2*m]),\n");
+print ("                      .a_priority(level_intpend_w_prior_en[0][2*m]),\n");
+print ("                      .b_id(level_intpend_id[0][2*m+1]),\n");
+print ("                      .b_priority(level_intpend_w_prior_en[0][2*m+1]),\n");
+print ("                      .out_id(level_intpend_id_".$next_level."[m]),\n");
+print ("                      .out_priority(level_intpend_w_prior_en_".$next_level."[m])) ;\n");
+print ("        \n");
+print (" end\n\n");
+for (my $l=1; $l<int($NUM_LEVELS/2) ; $l++) {
+$next_level = $l+1;
+print ("// LEVEL".$l."\n");
+print ("logic [TOTAL_INT+2:0] [INTPRIORITY_BITS-1:0] level_intpend_w_prior_en_".$next_level.";\n");
+print ("logic [TOTAL_INT+2:0] [ID_BITS-1:0] level_intpend_id_".$next_level.";\n");
+print ("    for (m=0; m<=(TOTAL_INT)/(2**(".$next_level.")) ; m++) begin : COMPARE$l\n");
+print ("       if ( m == (TOTAL_INT)/(2**(".$next_level."))) begin \n");
+print ("            assign level_intpend_w_prior_en_".$next_level."[m+1] = '0 ;\n");
+print ("            assign level_intpend_id_".$next_level."[m+1]         = '0 ;\n");
+print ("       end\n");
+print ("       cmp_and_mux  #(\n");
+print ("                      .ID_BITS(ID_BITS),\n");
+print ("                      .INTPRIORITY_BITS(INTPRIORITY_BITS)) cmp_l".$next_level." (\n");
+print ("                      .a_id(level_intpend_id_".$l."[2*m]),\n");
+print ("                      .a_priority(level_intpend_w_prior_en_".$l."[2*m]),\n");
+print ("                      .b_id(level_intpend_id_".$l."[2*m+1]),\n");
+print ("                      .b_priority(level_intpend_w_prior_en_".$l."[2*m+1]),\n");
+print ("                      .out_id(level_intpend_id_".$next_level."[m]),\n");
+print ("                      .out_priority(level_intpend_w_prior_en_".$next_level."[m])) ;\n");
+print ("        \n");
+print (" end\n\n");
+}
+### ADD FLOP STAGE
+print ("for (i=0; i<=TOTAL_INT/2**(NUM_LEVELS/2) ; i++) begin : MIDDLE_FLOPS\n");
+print ("  rvdff #(INTPRIORITY_BITS) level2_intpend_prior_reg  (.*, .din (level_intpend_w_prior_en_".$next_level."[i]), .dout(l2_intpend_w_prior_en_ff[i]),  .clk(active_clk));\n");
+print ("  rvdff #(ID_BITS)          level2_intpend_id_reg     (.*, .din (level_intpend_id_".$next_level."[i]),         .dout(l2_intpend_id_ff[i]),          .clk(active_clk));\n");
+print ("end\n");
+}else{
+print ("for (i=0; i<=TOTAL_INT/2**(NUM_LEVELS/2) ; i++) begin : MIDDLE_FLOPS\n");
+print ("  rvdff #(INTPRIORITY_BITS) level2_intpend_prior_reg  (.*, .din (level_intpend_w_prior_en[0][i]), .dout(l2_intpend_w_prior_en_ff[i]),  .clk(active_clk));\n");
+print ("  rvdff #(ID_BITS)          level2_intpend_id_reg     (.*, .din (level_intpend_id[0][i]),         .dout(l2_intpend_id_ff[i]),          .clk(active_clk));\n");
+print ("end\n");
+}
+### END FLOP STAGE
+$next_level = int($NUM_LEVELS/2) + 1;
+my $tmp = int($NUM_LEVELS/2);
+print ("// LEVEL".$tmp."\n");
+print ("logic [TOTAL_INT+2:0] [INTPRIORITY_BITS-1:0] levelx_intpend_w_prior_en_".$next_level.";\n");
+print ("logic [TOTAL_INT+2:0] [ID_BITS-1:0] levelx_intpend_id_".$next_level.";\n");
+print ("    for (m=0; m<=(TOTAL_INT)/(2**(".$next_level.")) ; m++) begin : COMPARE$tmp\n");
+print ("       if ( m == (TOTAL_INT)/(2**(".$next_level."))) begin \n");
+print ("            assign levelx_intpend_w_prior_en_".$next_level."[m+1] = '0 ;\n");
+print ("            assign levelx_intpend_id_".$next_level."[m+1]         = '0 ;\n");
+print ("       end\n");
+print ("       cmp_and_mux  #(\n");
+print ("                      .ID_BITS(ID_BITS),\n");
+print ("                      .INTPRIORITY_BITS(INTPRIORITY_BITS)) cmp_l".$next_level." (\n");
+print ("                      .a_id(levelx_intpend_id[$tmp][2*m]),\n");
+print ("                      .a_priority(levelx_intpend_w_prior_en[$tmp][2*m]),\n");
+print ("                      .b_id(levelx_intpend_id[$tmp][2*m+1]),\n");
+print ("                      .b_priority(levelx_intpend_w_prior_en[$tmp][2*m+1]),\n");
+print ("                      .out_id(levelx_intpend_id_".$next_level."[m]),\n");
+print ("                      .out_priority(levelx_intpend_w_prior_en_".$next_level."[m])) ;\n");
+print ("        \n");
+print (" end\n\n");
+for (my $l=int($NUM_LEVELS/2)+1; $l<$NUM_LEVELS ; $l++) {
+$next_level = $l+1;
+print ("// LEVEL".$l."\n");
+print ("logic [TOTAL_INT+2:0] [INTPRIORITY_BITS-1:0] levelx_intpend_w_prior_en_".$next_level.";\n");
+print ("logic [TOTAL_INT+2:0] [ID_BITS-1:0] levelx_intpend_id_".$next_level.";\n");
+print ("    for (m=0; m<=(TOTAL_INT)/(2**(".$next_level.")) ; m++) begin : COMPARE$l\n");
+print ("       if ( m == (TOTAL_INT)/(2**(".$next_level."))) begin \n");
+print ("            assign levelx_intpend_w_prior_en_".$next_level."[m+1] = '0 ;\n");
+print ("            assign levelx_intpend_id_".$next_level."[m+1]         = '0 ;\n");
+print ("       end\n");
+print ("       cmp_and_mux  #(\n");
+print ("                      .ID_BITS(ID_BITS),\n");
+print ("                      .INTPRIORITY_BITS(INTPRIORITY_BITS)) cmp_l".$next_level." (\n");
+print ("                      .a_id(levelx_intpend_id_".$l."[2*m]),\n");
+print ("                      .a_priority(levelx_intpend_w_prior_en_".$l."[2*m]),\n");
+print ("                      .b_id(levelx_intpend_id_".$l."[2*m+1]),\n");
+print ("                      .b_priority(levelx_intpend_w_prior_en_".$l."[2*m+1]),\n");
+print ("                      .out_id(levelx_intpend_id_".$next_level."[m]),\n");
+print ("                      .out_priority(levelx_intpend_w_prior_en_".$next_level."[m])) ;\n");
+print ("        \n");
+print (" end\n\n");
+}
+print ("assign claimid_in[ID_BITS-1:0]                      =      levelx_intpend_id_".$next_level."[0] ;   // This is the last level output\n");
+print ("assign selected_int_priority[INTPRIORITY_BITS-1:0]  =      levelx_intpend_w_prior_en_".$next_level."[0] ;\n");
+print ("`else\n");
+$next_level = 1;
+print ("// LEVEL0\n");
+print ("logic [TOTAL_INT+2:0] [INTPRIORITY_BITS-1:0] level_intpend_w_prior_en_".$next_level.";\n");
+print ("logic [TOTAL_INT+2:0] [ID_BITS-1:0] level_intpend_id_".$next_level.";\n");
+print ("    for (m=0; m<=(TOTAL_INT)/(2**(".$next_level.")) ; m++) begin : COMPARE0\n");
+print ("       if ( m == (TOTAL_INT)/(2**(".$next_level."))) begin \n");
+print ("            assign level_intpend_w_prior_en_".$next_level."[m+1] = '0 ;\n");
+print ("            assign level_intpend_id_".$next_level."[m+1]         = '0 ;\n");
+print ("       end\n");
+print ("       cmp_and_mux  #(\n");
+print ("                      .ID_BITS(ID_BITS),\n");
+print ("                      .INTPRIORITY_BITS(INTPRIORITY_BITS)) cmp_l".$next_level." (\n");
+print ("                      .a_id(level_intpend_id[0][2*m]),\n");
+print ("                      .a_priority(level_intpend_w_prior_en[0][2*m]),\n");
+print ("                      .b_id(level_intpend_id[0][2*m+1]),\n");
+print ("                      .b_priority(level_intpend_w_prior_en[0][2*m+1]),\n");
+print ("                      .out_id(level_intpend_id_".$next_level."[m]),\n");
+print ("                      .out_priority(level_intpend_w_prior_en_".$next_level."[m])) ;\n");
+print ("        \n");
+print (" end\n\n");
+for (my $l=1; $l<$NUM_LEVELS ; $l++) {
+$next_level = $l+1;
+print ("// LEVEL".$l."\n");
+print ("logic [TOTAL_INT+2:0] [INTPRIORITY_BITS-1:0] level_intpend_w_prior_en_".$next_level.";\n");
+print ("logic [TOTAL_INT+2:0] [ID_BITS-1:0] level_intpend_id_".$next_level.";\n");
+print ("    for (m=0; m<=(TOTAL_INT)/(2**(".$next_level.")) ; m++) begin : COMPARE$l\n");
+print ("       if ( m == (TOTAL_INT)/(2**(".$next_level."))) begin \n");
+print ("            assign level_intpend_w_prior_en_".$next_level."[m+1] = '0 ;\n");
+print ("            assign level_intpend_id_".$next_level."[m+1]         = '0 ;\n");
+print ("       end\n");
+print ("       cmp_and_mux  #(\n");
+print ("                      .ID_BITS(ID_BITS),\n");
+print ("                      .INTPRIORITY_BITS(INTPRIORITY_BITS)) cmp_l".$next_level." (\n");
+print ("                      .a_id(level_intpend_id_".$l."[2*m]),\n");
+print ("                      .a_priority(level_intpend_w_prior_en_".$l."[2*m]),\n");
+print ("                      .b_id(level_intpend_id_".$l."[2*m+1]),\n");
+print ("                      .b_priority(level_intpend_w_prior_en_".$l."[2*m+1]),\n");
+print ("                      .out_id(level_intpend_id_".$next_level."[m]),\n");
+print ("                      .out_priority(level_intpend_w_prior_en_".$next_level."[m])) ;\n");
+print ("        \n");
+print (" end\n\n");
+}
+print ("assign claimid_in[ID_BITS-1:0]                      =      level_intpend_id_".$next_level."[0] ;   // This is the last level output\n");
+print ("assign selected_int_priority[INTPRIORITY_BITS-1:0]  =      level_intpend_w_prior_en_".$next_level."[0] ;\n");
+print ("`endif\n");
+

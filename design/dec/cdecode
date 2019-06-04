@@ -1,0 +1,254 @@
+
+.definition
+
+
+
+# invalid rs2=0
+c.add0 =        [1001.....1....10]
+c.add1 =        [1001......1...10]
+c.add2 =        [1001.......1..10]
+c.add3 =        [1001........1.10]
+c.add4 =        [1001.........110]
+
+# invalid rs2=0
+c.mv0 =        [1000.....1....10]
+c.mv1 =        [1000......1...10]
+c.mv2 =        [1000.......1..10]
+c.mv3 =        [1000........1.10]
+c.mv4 =        [1000.........110]
+
+
+# invalid if rs1=0
+c.jalr0 =       [10011....0000010]
+c.jalr1 =       [1001.1...0000010]
+c.jalr2 =       [1001..1..0000010]
+c.jalr3 =       [1001...1.0000010]
+c.jalr4 =       [1001....10000010]
+
+c.addi  =        [000...........01]
+
+# invalid imm=0
+c.addi16sp0 =   [011100010.....01]
+c.addi16sp1 =   [011.000101....01]
+c.addi16sp2 =   [011.00010.1...01]
+c.addi16sp3 =   [011.00010..1..01]
+c.addi16sp4 =   [011.00010...1.01]
+c.addi16sp5 =   [011.00010....101]
+
+# invalid uimm=0
+c.addi4spn0 =   [0001..........00]
+c.addi4spn1 =   [000.1.........00]
+c.addi4spn2 =   [000..1........00]
+c.addi4spn3 =   [000...1.......00]
+c.addi4spn4 =   [000....1......00]
+c.addi4spn5 =   [000.....1.....00]
+c.addi4spn6 =   [000......1....00]
+c.addi4spn7 =   [000.......1...00]
+
+
+c.and =         [100011...11...01]
+c.andi =        [100.10........01]
+c.beqz =        [110...........01]
+c.bnez =        [111...........01]
+c.ebreak =      [1001000000000010]
+c.j =           [101...........01]
+c.jal =         [001...........01]
+
+
+c.jr0 =                 [10001....0000010]
+c.jr1 =                 [1000.1...0000010]
+c.jr2 =                 [1000..1..0000010]
+c.jr3 =                 [1000...1.0000010]
+c.jr4 =                 [1000....10000010]
+
+c.li =           [010...........01]
+
+# invalid rd=x2 or imm=0
+c.lui0 =                [01111.........01]
+c.lui1 =                [0111.1........01]
+c.lui2 =                [0111..1.......01]
+c.lui3 =                [0111...0......01]
+c.lui4 =                [0111....1.....01]
+c.lui5 =                [011.1....1....01]
+c.lui6 =                [011..1...1....01]
+c.lui7 =                [011...1..1....01]
+c.lui8 =                [011....0.1....01]
+c.lui9 =                [011.....11....01]
+c.lui10=                [011.1.....1...01]
+c.lui11=                [011..1....1...01]
+c.lui12 =               [011...1...1...01]
+c.lui13 =               [011....0..1...01]
+c.lui14 =               [011.....1.1...01]
+c.lui15 =               [011.1......1..01]
+c.lui16 =               [011..1.....1..01]
+c.lui17 =               [011...1....1..01]
+c.lui18 =               [011....0...1..01]
+c.lui19 =               [011.....1..1..01]
+c.lui20 =               [011.1.......1.01]
+c.lui21 =               [011..1......1.01]
+c.lui22 =               [011...1.....1.01]
+c.lui23 =               [011....0....1.01]
+c.lui24 =               [011.....1...1.01]
+c.lui25 =               [011.1........101]
+c.lui26 =               [011..1.......101]
+c.lui27 =               [011...1......101]
+c.lui28 =               [011....0.....101]
+c.lui29 =               [011.....1....101]
+
+
+c.lw =          [010...........00]
+
+
+c.lwsp =        [010...........10]
+
+c.or =          [100011...10...01]
+
+# bit 5 of the shift must be 0 to be legal
+c.slli =        [0000..........10]
+
+c.srai =        [100001........01]
+
+c.srli =        [100000........01]
+
+c.sub =         [100011...00...01]
+c.sw =          [110...........00]
+c.swsp =        [110...........10]
+c.xor =         [100011...01...01]
+
+
+.input 
+rv32c = {
+	i[15]
+	i[14]
+	i[13]
+	i[12]
+	i[11]
+	i[10]
+	i[9]
+	i[8]
+	i[7]
+	i[6]
+	i[5]
+	i[4]
+	i[3]
+	i[2]
+	i[1]
+	i[0]
+}
+
+.output
+rv32c = {
+        rdrd
+        rdrs1
+        rs2rs2
+        rdprd
+        rdprs1
+        rs2prs2
+        rs2prd
+	uimm9_2
+	ulwimm6_2
+	ulwspimm7_2
+	rdeq2
+	rdeq1
+	rs1eq2
+	sbroffset8_1
+	simm9_4
+	simm5_0
+	sjaloffset11_1
+	sluimm17_12
+	uimm5_0
+	uswimm6_2
+	uswspimm7_2
+        o[31]           
+        o[30]           
+        o[29]           
+        o[28]           
+        o[27]           
+        o[26]           
+        o[25]           
+        o[24]           
+        o[23]           
+        o[22]           
+        o[21]           
+        o[20]           
+        o[19]           
+        o[18]           
+        o[17]           
+        o[16]           
+        o[15]           
+        o[14]           
+        o[13]           
+        o[12]           
+        o[11]           
+        o[10]           
+        o[9]            
+        o[8]            
+        o[7]            
+        o[6]            
+        o[5]            
+        o[4]            
+        o[3]            
+        o[2]            
+        o[1]            
+        o[0]            
+      }
+
+#  assign rs2d[4:0] = i[6:2];
+#
+#   assign rdd[4:0] = i[11:7];
+#
+#   assign rdpd[4:0] = {2'b01, i[9:7]};
+#
+#   assign rs2pd[4:0] = {2'b01, i[4:2]};  
+
+.decode
+
+
+
+
+rv32c[c.add{0-4}] =             { rdrd rdrs1 rs2rs2                                    o[5] o[4] o[1] o[0] }
+
+rv32c[c.mv{0-4}] =              { rdrd rs2rs2                                          o[5] o[4] o[1] o[0] }
+
+rv32c[c.addi] =                 { rdrd rdrs1 simm5_0                                          o[4] o[1] o[0] }
+
+rv32c[c.addi16sp{0-5}] =        { rdeq2 rs1eq2 simm9_4                                        o[4] o[1] o[0] }
+rv32c[c.addi4spn{0-7}] =        { rs2prd rs1eq2 uimm9_2                                         o[4] o[1] o[0] }
+
+
+rv32c[c.and] =                  { rdprd rdprs1 rs2prs2          o[14] o[13] o[12]      o[5] o[4] o[1] o[0] }
+rv32c[c.andi] =                 { rdprd rdprs1 simm5_0            o[14] o[13] o[12]           o[4] o[1] o[0] }
+rv32c[c.beqz] =                 { rdprs1 sbroffset8_1                                o[6] o[5]      o[1] o[0] }
+rv32c[c.bnez] =                 { rdprs1 sbroffset8_1                          o[12] o[6] o[5]      o[1] o[0] }
+
+
+rv32c[c.ebreak] =               {                            o[20]                o[6] o[5] o[4] o[1] o[0] }
+
+rv32c[c.j] =                    { sjaloffset11_1                                            o[6] o[5]      o[3] o[2] o[1] o[0] }
+rv32c[c.jal] =                  { sjaloffset11_1 rdeq1                                      o[6] o[5]      o[3] o[2] o[1] o[0] }
+
+
+rv32c[c.jalr{0-4}] =            { rdeq1 rdrs1                                           o[6] o[5]           o[2] o[1] o[0] }
+rv32c[c.jr{0-4}] =              {       rdrs1                                           o[6] o[5]           o[2] o[1] o[0] }
+rv32c[c.li] =                   { rdrd simm5_0                                               o[4]           o[1] o[0] }
+
+rv32c[c.lui{0-29}] =            { rdrd sluimm17_12                                                o[5] o[4]      o[2] o[1] o[0] }
+rv32c[c.lw] =                   { rs2prd rdprs1 ulwimm6_2                    o[13]                                 o[1] o[0] }
+rv32c[c.lwsp] =                 { rdrd rs1eq2 ulwspimm7_2                    o[13]                                 o[1] o[0] }
+
+
+rv32c[c.or] =                   { rdprd rdprs1 rs2prs2               o[14] o[13]             o[5] o[4] o[1] o[0] }
+
+rv32c[c.slli] =            { rdrd rdrs1 uimm5_0                               o[12]            o[4] o[1] o[0] }
+rv32c[c.srai] =           { rdprd rdprs1 uimm5_0          o[30] o[14]        o[12]            o[4] o[1] o[0] }
+rv32c[c.srli] =            { rdprd rdprs1 uimm5_0                o[14]        o[12]            o[4] o[1] o[0] }
+
+
+rv32c[c.sub] =                  { rdprd rdprs1 rs2prs2        o[30]                          o[5] o[4] o[1] o[0] }
+rv32c[c.sw] =                   { rdprs1 rs2prs2 uswimm6_2                   o[13]             o[5]      o[1] o[0] }
+rv32c[c.swsp] =                 { rs2rs2 rs1eq2  uswspimm7_2                 o[13]             o[5]      o[1] o[0] }
+rv32c[c.xor] =                  { rdprd rdprs1 rs2prs2              o[14]                    o[5] o[4] o[1] o[0] }
+
+
+
+.end

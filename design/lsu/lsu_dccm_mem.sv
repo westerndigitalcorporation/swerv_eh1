@@ -26,7 +26,9 @@
 // 
 // //********************************************************************************
 
-module lsu_dccm_mem (
+module lsu_dccm_mem 
+   import swerv_types::*;
+(
    input logic 	       clk,                                              // clock 
    input logic 	       rst_l,                                             
    input logic         lsu_freeze_dc3,                                   // freeze
@@ -110,9 +112,8 @@ module lsu_dccm_mem (
                                      .WE(wren_bank[i]),
                                      .ADR(addr_bank[i]),
                                      .D(dccm_wr_data[DCCM_FDATA_WIDTH-1:0]),
-                                     .Q(dccm_bank_dout[i][DCCM_FDATA_WIDTH-1:0]), 
+                                     .Q(dccm_bank_dout[i][DCCM_FDATA_WIDTH-1:0])
 
-                                      .*
                                     );
      
    end : mem_bank

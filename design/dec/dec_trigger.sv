@@ -22,7 +22,9 @@
 // Comments:
 //
 //********************************************************************************
-module dec_trigger (
+module dec_trigger 
+   import swerv_types::*;
+(
    input logic 	       clk,
    input logic 	       rst_l,
 
@@ -47,8 +49,8 @@ module dec_trigger (
       rvmaskandmatch trigger_i0_match (.mask(trigger_pkt_any[i].tdata2[31:0]), .data(dec_i0_match_data[i][31:0]), .masken(trigger_pkt_any[i].match), .match(dec_i0_trigger_data_match[i]));  
       rvmaskandmatch trigger_i1_match (.mask(trigger_pkt_any[i].tdata2[31:0]), .data(dec_i1_match_data[i][31:0]), .masken(trigger_pkt_any[i].match), .match(dec_i1_trigger_data_match[i]));
 
-      assign dec_i0_trigger_match_d[i] = trigger_pkt_any[i].execute & dec_i0_trigger_data_match[i];
-      assign dec_i1_trigger_match_d[i] = trigger_pkt_any[i].execute & dec_i1_trigger_data_match[i];
+      assign dec_i0_trigger_match_d[i] = trigger_pkt_any[i].execute & trigger_pkt_any[i].m & dec_i0_trigger_data_match[i];
+      assign dec_i1_trigger_match_d[i] = trigger_pkt_any[i].execute & trigger_pkt_any[i].m & dec_i1_trigger_data_match[i];
    end
 
 endmodule // dec_trigger

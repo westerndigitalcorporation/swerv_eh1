@@ -1,5 +1,7 @@
 # SweRV RISC-V Core<sup>TM</sup> 1.1 from Western Digital
 
+This repository is deprecated. Please use the [Chip Alliance repository](https://githib.com/chipalliance/Cores-SwerV).
+
 This repository contains the SweRV Core<sup>TM</sup> version 1.1 design
 RTL. This is a mirror repository. The main repository is in the [Chip
 Alliance github page.](https://github.com/chipsalliance/Cores-SweRV)

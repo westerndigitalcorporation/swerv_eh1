@@ -157,6 +157,7 @@ module lsu_bus_write_buffer (
    
    state_t [DEPTH-1:0]       busfifo_state;
    state_t [DEPTH-1:0]       busfifo_nxtstate;
+   logic [DEPTH-1:0][2:0]    busfifo_state_dout;
    logic [DEPTH-1:0]         busfifo_state_en;
    logic [DEPTH-1:0]         busfifo_bus_state_en;
 
@@ -488,8 +489,9 @@ module lsu_bus_write_buffer (
             end
          endcase
       end
-  
-      rvdffs #(.WIDTH(3)) busfifo_state_ff (.din(busfifo_nxtstate[i]), .dout({busfifo_state[i]}), .en(busfifo_state_en[i]), .clk(lsu_free_c2_clk), .*);
+
+   assign busfifo_state[i] = state_t'(busfifo_state_dout[i]);
+      rvdffs #(.WIDTH(3)) busfifo_state_ff (.din(busfifo_nxtstate[i]), .dout(busfifo_state_dout[i]), .en(busfifo_state_en[i]), .clk(lsu_free_c2_clk), .*);
       rvdffe #(.WIDTH(32)) busfifo_addrff (.din(busfifo_addr_in[i]), .dout(busfifo_addr[i]), .en(busfifo_wr_en[i]), .*);
       rvdffs #(.WIDTH(8)) busfifo_byteenff (.din(busfifo_byteen_in[i]), .dout(busfifo_byteen[i]), .en(busfifo_wr_en[i]), .clk(lsu_wrbuf_c1_clk), .*);
       rvdffs #(.WIDTH(2)) busfifo_sizeff (.din(busfifo_size_in[i]), .dout(busfifo_size[i]), .en(busfifo_wr_en[i]), .clk(lsu_wrbuf_c1_clk), .*);
